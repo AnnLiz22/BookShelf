@@ -1,8 +1,6 @@
 package org.example.service;
 
-import java.time.Year;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -51,7 +49,6 @@ public class LibraryService {
         allBooks.add(book);
       }
     }
-
     return allBooks;
   }
 
@@ -97,9 +94,26 @@ public class LibraryService {
          .collect(Collectors.groupingBy(Book::getYear, TreeMap::new, Collectors.toList()));
   }
 
-  public Map<Genre, Long> getNumberOfBooksForGivenGenre(){
+  public Map<Genre, Long> getNumberOfBooksForEachGenre(){
     return books.stream()
         .collect(Collectors.groupingBy(Book::getGenre, Collectors.counting()));
   }
 
+  public Map<Genre, Long> getGenreWithBiggestNumberOfBooks() {
+
+    Map<Genre, Long> genres = getNumberOfBooksForEachGenre();
+
+    Genre mostPopularGenre = null;
+    Long max = Long.MIN_VALUE;
+
+    for (Map.Entry<Genre, Long> entry : genres.entrySet()) {
+
+      if (entry.getValue() > max) {
+        max = entry.getValue();
+        mostPopularGenre = entry.getKey();
+      }
+    }
+    assert mostPopularGenre != null;
+    return Map.of(mostPopularGenre, max);
+  }
 }
