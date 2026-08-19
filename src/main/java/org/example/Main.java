@@ -115,7 +115,6 @@ public class Main {
         "9780374528378"
     );
 
-
     LibraryService libraryService = new LibraryService();
     libraryService.addBook(book1);
     libraryService.addBook(book2);
@@ -129,14 +128,14 @@ public class Main {
     libraryService.addBook(book10);
     libraryService.addBook(book11);
 
-    //System.out.println(libraryService.findById(1) );
-  //  System.out.println("All books : " + libraryService.getAllBooks());
-   // libraryService.getBooksByGenre();
-  //  libraryService.getBooksByReadingStatus();
-
-   // System.out.println(libraryService.getBooksByAuthor());
-  //  System.out.println("Sorted by year : " + libraryService.getBooksSortedByYear());
-    System.out.println("genre : " + libraryService.getNumberOfBooksForGivenGenre());
+    System.out.println(libraryService.findById(1) );
+    System.out.println("All books: " + libraryService.getAllBooks());
+    System.out.println("Books by genre: " +  libraryService.getBooksByGenre());
+    System.out.println("Books by reading status: " + libraryService.getBooksByReadingStatus());
+    System.out.println("Books by author: " + libraryService.getBooksByAuthor());
+    System.out.println("Books sorted by the year of publication: " + libraryService.getBooksSortedByYear());
+    System.out.println("Number of books for a given genre: " + libraryService.getNumberOfBooksForEachGenre());
+    System.out.println("Top genre: " + libraryService.getGenreWithBiggestNumberOfBooks());
 
     ConsoleUI consoleUI = new ConsoleUI(libraryService);
     consoleUI.start();
