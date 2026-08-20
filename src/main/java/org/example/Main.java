@@ -129,6 +129,7 @@ public class Main {
     libraryService.addBook(book11);
 
     System.out.println(libraryService.findById(1) );
+    System.out.println(libraryService.removeBook(2));
     System.out.println("All books: " + libraryService.getAllBooks());
     System.out.println("Books by genre: " +  libraryService.getBooksByGenre());
     System.out.println("Books by reading status: " + libraryService.getBooksByReadingStatus());
