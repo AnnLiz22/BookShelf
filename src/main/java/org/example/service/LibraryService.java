@@ -13,21 +13,15 @@ import org.example.model.Genre;
 import org.example.model.ReadingStatus;
 
 public class LibraryService {
-  // responsible for
-  // adding books
-  //removing books
-  //searching
-  //sorting
-  //grouping
-  //etc.
+  
   private final List<Book> books = new ArrayList<>();
 
   public void addBook(Book book) {
     books.add(book);
   }
 
-  public void removeBook(int id) {
-    books.removeIf(book -> book.getId() == id);
+  public boolean removeBook(int id) {
+    return books.removeIf(book -> book.getId() == id);
   }
 
   public Book findById(int id) {
