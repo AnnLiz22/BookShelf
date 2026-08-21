@@ -37,6 +37,15 @@ public class LibraryService {
     return book;
   }
 
+  public Book findBookByTitle(String title){
+    Book book = new Book();
+    for (Book book1 : books){
+      if(book1.getTitle().equalsIgnoreCase(title))
+        book = book1;
+    }
+    return book;
+  }
+
   public List<Book> getAllBooks() {
 
     List<Book> allBooks = new ArrayList<>();
@@ -144,5 +153,13 @@ public class LibraryService {
         .filter(book -> book.getAuthor().toString().equals(author))
         .collect(Collectors.groupingBy(Book::getAuthor));
 
+  }
+
+  public void setBookStatus(String title, ReadingStatus readingStatus){
+    for(Book book : books){
+      if(book.getTitle().equalsIgnoreCase(title)){
+        book.setReadingStatus(readingStatus);
+      }
+    }
   }
 }
