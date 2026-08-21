@@ -37,6 +37,7 @@ public class ConsoleUI {
      case 7 -> findBooksOfAuthor();
      case 8 -> showAuthorForGivenBookTitle();
      case 9 -> showGenreWithBiggestNumberOfBooks();
+     case 13 -> setReadingStatusForBookFromLibrary();
      case 0 -> {
       System.out.println("Goodbye! 👋");
       isRunning = false;
@@ -64,6 +65,7 @@ public class ConsoleUI {
    System.out.println("====================================");
    System.out.println("          📚 BOOKS CATALOG");
    System.out.println("====================================");
+   System.out.println("I. Show your library: ");
    System.out.println("1. Show all books");
    System.out.println("2. Show books by genre");
    System.out.println("3. Show books by author");
@@ -73,6 +75,13 @@ public class ConsoleUI {
    System.out.println("7. Find books of given author");
    System.out.println("8. Check author for given book title");
    System.out.println("9. Show top genre");
+   System.out.println("====================================");
+   System.out.println("II. Update your Book Shelf: ");
+   System.out.println("10. Add a book");
+   System.out.println("11. Add an Author");
+   System.out.println("12. Set the reading status for your book");
+   System.out.println("13. Remove a book from the Book Shelf");
+   System.out.println("====================================");
    System.out.println("0. Exit");
    System.out.println("====================================");
   }
@@ -138,5 +147,18 @@ public class ConsoleUI {
    Map<Genre, Long> genreWithBiggestNumOfBooks =
        libraryService.getGenreWithBiggestNumberOfBooks();
    System.out.println("Top genre on your book Shelf: " + genreWithBiggestNumOfBooks);
+  }
+
+  private void setReadingStatusForBookFromLibrary(){
+    System.out.println("Tape the book title: ");
+    String title = scanner.nextLine();
+    Book book = libraryService.findBookByTitle(title);
+
+    System.out.println("Set the status to: \n [WANT_TO_READ, READING, FINISHED, ABANDONED]");
+
+    ReadingStatus status = ReadingStatus.valueOf(scanner.nextLine().toUpperCase());
+
+    libraryService.setBookStatus(book.getTitle(), status);
+    System.out.println(book);
   }
  }
