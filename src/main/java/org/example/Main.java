@@ -15,6 +15,7 @@ public class Main {
     Author author4 = new Author(4, "J.R.R. Tolkien");
     Author author5 = new Author(5, "George Orwell");
     Author author6 = new Author(6, "Fyodor Dostoevsky");
+    Author author7 = new Author(7, "Stephen King");
 
     Book book1 = new Book(
         1,
@@ -109,7 +110,7 @@ public class Main {
     Book book11 = new Book(
         11,
         "Misery",
-        author6,
+        author7,
         Genre.FICTION,
         1880,
         "9780374528378"
@@ -127,16 +128,6 @@ public class Main {
     libraryService.addBook(book9);
     libraryService.addBook(book10);
     libraryService.addBook(book11);
-
-    System.out.println(libraryService.findById(1) );
-    System.out.println(libraryService.removeBook(2));
-    System.out.println("All books: " + libraryService.getAllBooks());
-    System.out.println("Books by genre: " +  libraryService.getBooksByGenre());
-    System.out.println("Books by reading status: " + libraryService.getBooksByReadingStatus());
-    System.out.println("Books by author: " + libraryService.getBooksByAuthor());
-    System.out.println("Books sorted by the year of publication: " + libraryService.getBooksSortedByYear());
-    System.out.println("Number of books for a given genre: " + libraryService.getNumberOfBooksForEachGenre());
-    System.out.println("Top genre: " + libraryService.getGenreWithBiggestNumberOfBooks());
 
     ConsoleUI consoleUI = new ConsoleUI(libraryService);
     consoleUI.start();
