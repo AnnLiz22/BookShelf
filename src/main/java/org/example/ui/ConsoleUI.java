@@ -152,13 +152,17 @@ public class ConsoleUI {
   private void setReadingStatusForBookFromLibrary(){
     System.out.println("Tape the book title: ");
     String title = scanner.nextLine();
-    Book book = libraryService.findBookByTitle(title);
+    try {
+     Book book = libraryService.findBookByTitle(title);
+      System.out.println("Set the status to: \n [WANT_TO_READ, READING, FINISHED, ABANDONED]");
+      ReadingStatus status = ReadingStatus
+          .valueOf(scanner.nextLine().toUpperCase().replace(" ", "_"));
+      libraryService.setBookStatus(book.getTitle(), status);
+      System.out.println(book);
 
-    System.out.println("Set the status to: \n [WANT_TO_READ, READING, FINISHED, ABANDONED]");
+    } catch (Exception e) {
+      System.out.println("The selected title not on the Book Shelf.");
+    }
 
-    ReadingStatus status = ReadingStatus.valueOf(scanner.nextLine().toUpperCase());
-
-    libraryService.setBookStatus(book.getTitle(), status);
-    System.out.println(book);
   }
  }
