@@ -1,7 +1,7 @@
 package org.example.model;
 
 public class Book {
-
+  private static int nextId = 1;
   private int id;
   private String title;
   private Author author;
@@ -9,7 +9,7 @@ public class Book {
   private ReadingStatus readingStatus;
   private int year;
   private String isbn;
-  private boolean available;
+
 
   public Book() {
     this.readingStatus = ReadingStatus.WANT_TO_READ;
@@ -25,15 +25,14 @@ public class Book {
     this.isbn = isbn;
   }
 
-  public Book(int id, String title, Author author, Genre genre, int year, String isbn, boolean available) {
-    this.id = id;
+  public Book(String title, Author author, Genre genre, int year, String isbn) {
+    this.id = nextId++;
     this.title = title;
     this.author = author;
     this.genre = genre;
     this.readingStatus = ReadingStatus.WANT_TO_READ;
     this.year = year;
     this.isbn = isbn;
-    this.available = available;
   }
 
   public int getId() {
@@ -82,14 +81,6 @@ public class Book {
 
   public void setIsbn(String isbn) {
     this.isbn = isbn;
-  }
-
-  public boolean isAvailable() {
-    return available;
-  }
-
-  public void setAvailable(boolean available) {
-    this.available = available;
   }
 
   public ReadingStatus getReadingStatus() {
