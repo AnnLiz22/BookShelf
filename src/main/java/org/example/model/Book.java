@@ -12,6 +12,7 @@ public class Book {
   private boolean available;
 
   public Book() {
+    this.readingStatus = ReadingStatus.WANT_TO_READ;
   }
 
   public Book(int id, String title, Author author, Genre genre, int year, String isbn) {
@@ -19,6 +20,7 @@ public class Book {
     this.title = title;
     this.author = author;
     this.genre = genre;
+    this.readingStatus = ReadingStatus.WANT_TO_READ;
     this.year = year;
     this.isbn = isbn;
   }
@@ -28,6 +30,7 @@ public class Book {
     this.title = title;
     this.author = author;
     this.genre = genre;
+    this.readingStatus = ReadingStatus.WANT_TO_READ;
     this.year = year;
     this.isbn = isbn;
     this.available = available;
