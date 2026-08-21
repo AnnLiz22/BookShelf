@@ -38,12 +38,11 @@ public class LibraryService {
   }
 
   public Book findBookByTitle(String title){
-    Book book = new Book();
-    for (Book book1 : books){
-      if(book1.getTitle().equalsIgnoreCase(title))
-        book = book1;
+    for (Book book : books) {
+      if (book.getTitle().equalsIgnoreCase(title))
+      return book;
     }
-    return book;
+    throw new IllegalArgumentException();
   }
 
   public List<Book> getAllBooks() {
