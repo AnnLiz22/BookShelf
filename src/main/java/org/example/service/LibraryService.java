@@ -15,16 +15,21 @@ import org.example.model.ReadingStatus;
 public class LibraryService {
   
   private final List<Book> books = new ArrayList<>();
+  private final List<Author> authors = new ArrayList<>();
 
   public void addBook(Book book) {
     books.add(book);
+  }
+
+  public void addAuthor(Author author){
+    authors.add(author);
   }
 
   public boolean removeBook(int id) {
     return books.removeIf(book -> book.getId() == id);
   }
 
-  public Book findById(int id) {
+  public Book findBookById(int id) {
     Book book = new Book();
     for (Book book1 : books) {
       if (book1.getId() == id) book = book1;
@@ -88,6 +93,27 @@ public class LibraryService {
          .collect(Collectors.groupingBy(Book::getYear, TreeMap::new, Collectors.toList()));
   }
 
+  public List<Author> getAllAuthors() {
+
+    Map<Author, List<Book>> bookAuthors = books.stream()
+        .collect(Collectors.groupingBy(Book::getAuthor, Collectors.toList()));
+   List<Author> authors = new ArrayList<>();
+    for (Map.Entry<Author, List<Book>> entry : bookAuthors.entrySet()) {
+       authors.add(entry.getKey());
+    }
+    return authors;
+  }
+
+  public Author findAuthorByBookTitle(String title){
+    Author author = new Author();
+    for(Book book : books){
+      if(book.getTitle().equalsIgnoreCase(title)){
+        author = book.getAuthor();
+      }
+    }
+    return author;
+  }
+
   public Map<Genre, Long> getNumberOfBooksForEachGenre(){
     return books.stream()
         .collect(Collectors.groupingBy(Book::getGenre, Collectors.counting()));
@@ -109,5 +135,14 @@ public class LibraryService {
     }
     assert mostPopularGenre != null;
     return Map.of(mostPopularGenre, max);
+  }
+
+  public Map<Author, List<Book>> getBooksForGivenAuthor (String author) {
+
+    return books
+        .stream()
+        .filter(book -> book.getAuthor().toString().equals(author))
+        .collect(Collectors.groupingBy(Book::getAuthor));
+
   }
 }
