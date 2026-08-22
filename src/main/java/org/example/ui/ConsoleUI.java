@@ -38,7 +38,8 @@ public class ConsoleUI {
      case 8 -> showAuthorForGivenBookTitle();
      case 9 -> showGenreWithBiggestNumberOfBooks();
      case 10 -> addBook();
-     case 13 -> setReadingStatusForBookFromLibrary();
+     case 11 -> addAuthor();
+     case 12 -> setReadingStatusForBookFromLibrary();
      case 0 -> {
       System.out.println("Goodbye! 👋");
       isRunning = false;
@@ -141,7 +142,6 @@ public class ConsoleUI {
    String author = scanner.nextLine();
    System.out.println("Books of " + author + " : "
        + libraryService.getBooksForGivenAuthor(author));
-
   }
 
   private void showGenreWithBiggestNumberOfBooks(){
@@ -158,9 +158,8 @@ public class ConsoleUI {
       System.out.println("Book author: ");
       String authorName = scanner.nextLine();
 
-      System.out.println("Book genre: \n [WANT_TO_READ, READING, FINISHED, ABANDONED]");
-      String genre = scanner.nextLine();
-      Genre genre1 = Genre.valueOf(genre.toUpperCase());
+      System.out.println("Book genre:\n BIOGRAPHY, FICTION, FANTASY, HISTORY, SCIENCE, TECHNOLOGY, OTHER");
+      Genre genre = Genre.valueOf(scanner.nextLine().toUpperCase());
 
       System.out.println("Book isbn: ");
       String isbn = scanner.nextLine();
@@ -169,13 +168,51 @@ public class ConsoleUI {
       int year = scanner.nextInt();
 
       Author author = new Author(authorName);
-      Book book = new Book(title, author, genre1, year, isbn);
-      libraryService.addAuthor(author);
+      Book book = new Book(title, author, genre, year, isbn);
       libraryService.addBook(book);
 
       System.out.println("Book: " + book + "Added to your Book Shelf.");
     } catch (Exception e) {
       System.out.println("Book title and author must be set");
+    }
+  }
+
+  private void addAuthor() {
+    System.out.println("Author name: ");
+    String authorName = scanner.nextLine();
+    Author author;
+
+    try {
+      author = new Author(authorName);
+    } catch (Exception e) {
+      System.out.println("Incorrect author name");
+      return;
+    }
+      System.out.println("Do you want to add book for this author? [YES/NO]");
+      String response = scanner.nextLine().trim().toUpperCase();
+
+    if(response.equalsIgnoreCase("NO")) {
+      libraryService.addAuthor(author);
+      System.out.println("Author: " + author + " added.");
+      return;
+    }
+
+    while (response.equals("YES")) {
+        System.out.println("Book title: ");
+        String title = scanner.nextLine();
+        System.out.println("Genre: \n BIOGRAPHY, FICTION, FANTASY, HISTORY, SCIENCE, TECHNOLOGY, OTHER");
+        Genre genre = Genre.valueOf(scanner.nextLine().toUpperCase());
+
+        System.out.println("isbn:");
+        String isbn = scanner.nextLine();
+        System.out.println("year:");
+        int year = scanner.nextInt();
+        scanner.nextLine();
+
+        Book book = new Book(title, author, genre, year, isbn);
+        libraryService.addBook(book);
+        System.out.println("Author and book added. Do you want to add another book? [YES / NO]");
+        response = scanner.nextLine().toUpperCase();
     }
   }
 
