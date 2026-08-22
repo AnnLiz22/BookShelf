@@ -40,6 +40,7 @@ public class ConsoleUI {
      case 10 -> addBook();
      case 11 -> addAuthor();
      case 12 -> setReadingStatusForBookFromLibrary();
+     case 13 -> removeBookFromYourBookShelf();
      case 0 -> {
       System.out.println("Goodbye! 👋");
       isRunning = false;
@@ -230,6 +231,43 @@ public class ConsoleUI {
     } catch (Exception e) {
       System.out.println("The selected title not on the Book Shelf.");
     }
+  }
 
+  private void removeBookFromYourBookShelf() {
+
+    System.out.println("Give the book title: ");
+    String title = scanner.nextLine();
+    Book book;
+
+    try {
+      book = libraryService.findBookByTitle(title);
+      System.out.println("Are you sure you want to remove " + book + "[YES/NO]");
+
+      String response = scanner.nextLine().toUpperCase();
+      if (response.equals("YES")) {
+
+        libraryService.removeBookByTitle(book.getTitle());
+        System.out.println("Book removed.");
+      }
+
+    } catch (IllegalArgumentException e) {
+      System.out.println("Title duplicated. Give the author name.");
+
+      try{
+      String authorName = scanner.nextLine();
+      book = libraryService.findBookByTitleAndAuthorName(title, authorName);
+      System.out.println("Are you sure you want to remove " + book  + "[YES/NO]");
+
+      String response = scanner.nextLine().toUpperCase();
+      if (response.equals("YES")) {
+        libraryService.removeBookByTitleAndAuthor(title, authorName);
+        System.out.println("Book removed.");
+       }
+      }catch (NullPointerException ex){
+        System.out.println("Book with given title and author not found. Try again.");
+      }
+    } catch (NullPointerException e) {
+      System.out.println("Title not found");
+    }
   }
  }

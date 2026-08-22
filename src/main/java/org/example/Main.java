@@ -116,6 +116,15 @@ public class Main {
         "9780374528378"
     );
 
+    Book book12 = new Book(
+        12,
+        "Misery",
+        author6,
+        Genre.FICTION,
+        1880,
+        "9780374528300"
+    );
+
     LibraryService libraryService = new LibraryService();
     libraryService.addBook(book1);
     libraryService.addBook(book2);
@@ -128,6 +137,12 @@ public class Main {
     libraryService.addBook(book9);
     libraryService.addBook(book10);
     libraryService.addBook(book11);
+    libraryService.addBook(book12);
+    //System.out.println(libraryService.findBookByTitle("Miser"));
+   // System.out.println(libraryService.findBookByTitle("Misery"));
+    //System.out.println(libraryService.findBookByIsbn("9780143058144"));
+    //System.out.println(libraryService
+      //  .findBookByTitleAndAuthorName("Crime and Punishment","Fyodor Dostoevsky"));
 
     ConsoleUI consoleUI = new ConsoleUI(libraryService);
     consoleUI.start();
