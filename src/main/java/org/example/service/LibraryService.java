@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 import org.example.model.Author;
@@ -18,10 +19,30 @@ public class LibraryService {
   private final List<Author> authors = new ArrayList<>();
 
   public void addBook(Book book) {
+
     books.add(book);
+
+    boolean isNotInCatalogue = authors.stream()
+        .noneMatch(a -> a.getName().equalsIgnoreCase(book.getAuthor().getName()));
+    if(isNotInCatalogue){
+      authors.add(book.getAuthor());
+    }
+    if(!isNotInCatalogue){
+     Optional <Book> book1 = books.stream()
+         .filter(b->b.getAuthor().getName().equalsIgnoreCase(book.getAuthor().getName()))
+         .findFirst();
+     book.setAuthor(book1.get().getAuthor());
+    }
   }
 
   public void addAuthor(Author author){
+
+    boolean exists = authors.stream()
+        .anyMatch(a -> a.getName().equalsIgnoreCase(author.getName()));
+
+    if (exists) {
+      throw new IllegalArgumentException("Author already exists: " + author.getName());
+    }
     authors.add(author);
   }
 
@@ -103,12 +124,6 @@ public class LibraryService {
 
   public List<Author> getAllAuthors() {
 
-    Map<Author, List<Book>> bookAuthors = books.stream()
-        .collect(Collectors.groupingBy(Book::getAuthor, Collectors.toList()));
-   List<Author> authors = new ArrayList<>();
-    for (Map.Entry<Author, List<Book>> entry : bookAuthors.entrySet()) {
-       authors.add(entry.getKey());
-    }
     return authors;
   }
 

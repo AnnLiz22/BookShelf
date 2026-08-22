@@ -2,10 +2,19 @@ package org.example.model;
 
 public class Author {
 
+  private static int nextId = 1;
   private int id;
   private String name;
 
   public Author() {
+  }
+
+  public Author(String name) {
+    if(name==null||name.isBlank()){
+      throw new IllegalArgumentException();
+    }
+    this.id = nextId;
+    this.name = name;
   }
 
   public Author(int id, String name) {
@@ -15,6 +24,10 @@ public class Author {
 
   public int getId() {
     return id;
+  }
+
+  public static int getNextId() {
+    return nextId;
   }
 
   public void setId(int id) {

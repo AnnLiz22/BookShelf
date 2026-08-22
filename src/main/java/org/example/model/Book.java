@@ -26,6 +26,10 @@ public class Book {
   }
 
   public Book(String title, Author author, Genre genre, int year, String isbn) {
+
+    if (title == null || title.isBlank()) {
+      throw new IllegalArgumentException("Title cannot be null or empty");
+    }
     this.id = nextId++;
     this.title = title;
     this.author = author;
@@ -98,6 +102,6 @@ public class Book {
         ", author: " + author +
         ", genre: " + genre +
         ", readingStatus: " + readingStatus +
-        ", year: " + year + ".\n";
+        ", year: " + year + " isbn: " + isbn + ".\n";
   }
 }
