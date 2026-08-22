@@ -50,6 +50,14 @@ public class LibraryService {
     return books.removeIf(book -> book.getId() == id);
   }
 
+  public boolean removeBookByTitle(String title) {
+    return books.removeIf(book -> book.getTitle().equalsIgnoreCase(title));
+  }
+  public boolean removeBookByTitleAndAuthor(String title, String authorName) {
+    Book book = findBookByTitleAndAuthorName(title, authorName);
+    return books.remove(book);
+  }
+
   public Book findBookById(int id) {
     Book book = new Book();
     for (Book book1 : books) {
@@ -58,12 +66,36 @@ public class LibraryService {
     return book;
   }
 
-  public Book findBookByTitle(String title){
-    for (Book book : books) {
-      if (book.getTitle().equalsIgnoreCase(title))
-      return book;
+  public Book findBookByTitle(String title) {
+
+    Long booksWithGivenTitle = books
+        .stream()
+        .filter(book1 -> book1.getTitle()
+            .equalsIgnoreCase(title)).count();
+
+    if(booksWithGivenTitle>1) {
+      throw new IllegalArgumentException("Duplicated");
     }
-    throw new IllegalArgumentException();
+    if(booksWithGivenTitle<1){
+      throw new NullPointerException("Title not found");
+    }
+    Optional<Book> book = books.stream()
+        .filter(b -> b.getTitle().equalsIgnoreCase(title)).findFirst();
+      return book.get();
+    }
+
+public Book findBookByTitleAndAuthorName(String title, String authorName){
+    Optional<Book>book = books.stream()
+        .filter(b -> b.getTitle().equalsIgnoreCase(title)
+            &&b.getAuthor().getName().equalsIgnoreCase(authorName))
+        .findFirst();
+  return book.orElseThrow(()->new NullPointerException("Book not found"));
+}
+
+  public Book findBookByIsbn(String isbn){
+    Optional<Book> book = books.stream()
+        .filter(b -> b.getIsbn().equalsIgnoreCase(isbn)).findFirst();
+    return book.get();
   }
 
   public List<Book> getAllBooks() {
