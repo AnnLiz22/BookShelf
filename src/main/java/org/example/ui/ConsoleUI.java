@@ -37,6 +37,7 @@ public class ConsoleUI {
      case 7 -> findBooksOfAuthor();
      case 8 -> showAuthorForGivenBookTitle();
      case 9 -> showGenreWithBiggestNumberOfBooks();
+     case 10 -> addBook();
      case 13 -> setReadingStatusForBookFromLibrary();
      case 0 -> {
       System.out.println("Goodbye! 👋");
@@ -147,6 +148,35 @@ public class ConsoleUI {
    Map<Genre, Long> genreWithBiggestNumOfBooks =
        libraryService.getGenreWithBiggestNumberOfBooks();
    System.out.println("Top genre on your book Shelf: " + genreWithBiggestNumOfBooks);
+  }
+
+  private void addBook() {
+    try {
+      System.out.println("Book title: ");
+      String title = scanner.nextLine();
+
+      System.out.println("Book author: ");
+      String authorName = scanner.nextLine();
+
+      System.out.println("Book genre: \n [WANT_TO_READ, READING, FINISHED, ABANDONED]");
+      String genre = scanner.nextLine();
+      Genre genre1 = Genre.valueOf(genre.toUpperCase());
+
+      System.out.println("Book isbn: ");
+      String isbn = scanner.nextLine();
+
+      System.out.println("Book year: ");
+      int year = scanner.nextInt();
+
+      Author author = new Author(authorName);
+      Book book = new Book(title, author, genre1, year, isbn);
+      libraryService.addAuthor(author);
+      libraryService.addBook(book);
+
+      System.out.println("Book: " + book + "Added to your Book Shelf.");
+    } catch (Exception e) {
+      System.out.println("Book title and author must be set");
+    }
   }
 
   private void setReadingStatusForBookFromLibrary(){
