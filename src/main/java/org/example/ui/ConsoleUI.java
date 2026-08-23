@@ -97,7 +97,7 @@ public class ConsoleUI {
 
  private void showBooksByGenre() {
 
-  Map<Genre, List<Book>> books = libraryService.getBooksByGenre();
+  Map<Genre, List<String>> books = libraryService.getBooksByGenre();
   if (books.isEmpty()) {
    System.out.println("No books found");
    return;
@@ -107,19 +107,30 @@ public class ConsoleUI {
   }
 
   private void showAllAuthors(){
-   List<Author> authors = libraryService.getAllAuthors();
+    List<Author> authors = libraryService.getAllAuthors();
+    if (authors.isEmpty()) {
+      System.out.println("No books found");
+      return;
+    }
    System.out.println("========== Authors ==========");
    System.out.println(authors);
   }
 
-  private void showBooksByAuthor(){
-   Map<Author, List<Book>> booksByAuthors = libraryService.getBooksByAuthor();
-   System.out.println("========== Books by Authors ==========");
-   System.out.println(booksByAuthors);
+  private void showBooksByAuthor() {
+    try {
+      Map<Author, List<String>> booksByAuthors = libraryService.getBooksByAuthor();
+      System.out.println("========== Books by Authors ==========");
+      System.out.println(booksByAuthors);
+    } catch (Exception e) {
+      System.out.println("Author not found");
+    }
   }
-
   private void showBooksByReadingStatus(){
-   Map<ReadingStatus, List<Book>> booksByReadingStatus = libraryService.getBooksByReadingStatus();
+   Map<ReadingStatus, List<String>> booksByReadingStatus = libraryService.getBooksByReadingStatus();
+    if (booksByReadingStatus.isEmpty()) {
+      System.out.println("No books found");
+      return;
+    }
    System.out.println("========== Books by Reading status ==========");
    System.out.println(booksByReadingStatus);
 
@@ -127,6 +138,10 @@ public class ConsoleUI {
 
   private void showBooksByYear(){
    Map<Integer, List<Book>> booksByYear = libraryService.getBooksSortedByYear();
+    if (booksByYear.isEmpty()) {
+      System.out.println("No books found");
+      return;
+    }
    System.out.println("========== Books by Year of Publication ==========");
    System.out.println(booksByYear);
   }
@@ -134,15 +149,23 @@ public class ConsoleUI {
   private void showAuthorForGivenBookTitle(){
    System.out.println("Choose title: ");
    String title = scanner.nextLine();
-   Author author =  libraryService.findAuthorByBookTitle(title);
-   System.out.println("Author of " + title + ": " + author);
+   try {
+     Author author = libraryService.findAuthorOfBookByTitle(title);
+     System.out.println("Author of " + title + ": " + author);
+   } catch (Exception e) {
+     System.out.println("Title not found.");;
+   }
   }
 
   private void findBooksOfAuthor(){
    System.out.println("Choose author: ");
-   String author = scanner.nextLine();
-   System.out.println("Books of " + author + " : "
-       + libraryService.getBooksForGivenAuthor(author));
+   try {
+     String author = scanner.nextLine();
+     System.out.println("Books of " + author + " : "
+         + libraryService.getBooksForGivenAuthor(author));
+   }catch (NullPointerException e){
+     System.out.println("Author not found.");
+   }
   }
 
   private void showGenreWithBiggestNumberOfBooks(){
