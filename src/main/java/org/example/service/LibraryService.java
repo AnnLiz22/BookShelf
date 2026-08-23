@@ -1,8 +1,11 @@
 package org.example.service;
 
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.mapping;
+import static java.util.stream.Collectors.toList;
+
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -14,7 +17,7 @@ import org.example.model.Genre;
 import org.example.model.ReadingStatus;
 
 public class LibraryService {
-  
+
   private final List<Book> books = new ArrayList<>();
   private final List<Author> authors = new ArrayList<>();
 
@@ -24,18 +27,18 @@ public class LibraryService {
 
     boolean isNotInCatalogue = authors.stream()
         .noneMatch(a -> a.getName().equalsIgnoreCase(book.getAuthor().getName()));
-    if(isNotInCatalogue){
+    if (isNotInCatalogue) {
       authors.add(book.getAuthor());
     }
-    if(!isNotInCatalogue){
-     Optional <Book> book1 = books.stream()
-         .filter(b->b.getAuthor().getName().equalsIgnoreCase(book.getAuthor().getName()))
-         .findFirst();
-     book.setAuthor(book1.get().getAuthor());
+    if (!isNotInCatalogue) {
+      Optional<Book> book1 = books.stream()
+          .filter(b -> b.getAuthor().getName().equalsIgnoreCase(book.getAuthor().getName()))
+          .findFirst();
+      book.setAuthor(book1.orElseThrow().getAuthor());
     }
   }
 
-  public void addAuthor(Author author){
+  public void addAuthor(Author author) {
 
     boolean exists = authors.stream()
         .anyMatch(a -> a.getName().equalsIgnoreCase(author.getName()));
@@ -50,20 +53,18 @@ public class LibraryService {
     return books.removeIf(book -> book.getId() == id);
   }
 
-  public boolean removeBookByTitle(String title) {
-    return books.removeIf(book -> book.getTitle().equalsIgnoreCase(title));
+  public void removeBookByTitle(String title) {
+    books.removeIf(book -> book.getTitle().equalsIgnoreCase(title));
   }
-  public boolean removeBookByTitleAndAuthor(String title, String authorName) {
+
+  public void removeBookByTitleAndAuthor(String title, String authorName) {
     Book book = findBookByTitleAndAuthorName(title, authorName);
-    return books.remove(book);
+    books.remove(book);
   }
 
   public Book findBookById(int id) {
-    Book book = new Book();
-    for (Book book1 : books) {
-      if (book1.getId() == id) book = book1;
-    }
-    return book;
+    Optional <Book> book = books.stream().filter(b->b.getId()==id).findFirst();
+    return book.orElseThrow(NullPointerException::new);
   }
 
   public Book findBookByTitle(String title) {
@@ -73,105 +74,75 @@ public class LibraryService {
         .filter(book1 -> book1.getTitle()
             .equalsIgnoreCase(title)).count();
 
-    if(booksWithGivenTitle>1) {
+    if (booksWithGivenTitle > 1) {
       throw new IllegalArgumentException("Duplicated");
     }
-    if(booksWithGivenTitle<1){
-      throw new NullPointerException("Title not found");
-    }
+
     Optional<Book> book = books.stream()
         .filter(b -> b.getTitle().equalsIgnoreCase(title)).findFirst();
-      return book.get();
-    }
+    return book.orElseThrow(NullPointerException::new);
+  }
 
-public Book findBookByTitleAndAuthorName(String title, String authorName){
-    Optional<Book>book = books.stream()
+  public Book findBookByTitleAndAuthorName(String title, String authorName) {
+    Optional<Book> book = books.stream()
         .filter(b -> b.getTitle().equalsIgnoreCase(title)
-            &&b.getAuthor().getName().equalsIgnoreCase(authorName))
+            && b.getAuthor().getName().equalsIgnoreCase(authorName))
         .findFirst();
-  return book.orElseThrow(()->new NullPointerException("Book not found"));
-}
+    return book.orElseThrow(NullPointerException::new);
+  }
 
-  public Book findBookByIsbn(String isbn){
+  public Book findBookByIsbn(String isbn) {
     Optional<Book> book = books.stream()
         .filter(b -> b.getIsbn().equalsIgnoreCase(isbn)).findFirst();
-    return book.get();
+    return book.orElseThrow(NullPointerException::new);
   }
 
   public List<Book> getAllBooks() {
+   return books.stream().sorted(Comparator.comparing(Book::getTitle)).toList();
+  }
 
-    List<Book> allBooks = new ArrayList<>();
-    Iterator<Book> iterator = books.iterator();
-
-    for(Book book : books){
-      if(iterator.hasNext()){
-        iterator.next();
-        allBooks.add(book);
+  public Map<Author, List<String>> getBooksByAuthor() {
+      Optional <Author> author = authors.stream().findFirst();
+      if(author.isPresent()) {
+        return books.stream()
+            .collect(Collectors.groupingBy(Book::getAuthor, mapping(Book::getTitle, toList())));
       }
-    }
-    return allBooks;
+      throw new NullPointerException();
   }
 
-  public Map<Author, List<Book>> getBooksByAuthor() {
-
-    Map<Author, List<Book>> booksByAuthor = new HashMap<>();
-
-    for(Book book : books){
-    Author author = book.getAuthor();
-
-    booksByAuthor.computeIfAbsent(author, k -> new ArrayList<>() )
-        .add(book);
-  }
-    return booksByAuthor;
-  }
-
-  public Map<Genre, List<Book>> getBooksByGenre(){
-    Map<Genre, List<Book>> booksByGenre = new HashMap<>();
-    for(Book book : books){
-      Genre genre = book.getGenre();
-      booksByGenre.computeIfAbsent(genre, k -> new ArrayList<>())
-          .add(book);
-    }
-    return booksByGenre;
-  }
-
-  public Map<ReadingStatus, List<Book>> getBooksByReadingStatus(){
-    Map<ReadingStatus, List<Book>> booksByReadingStatus = new HashMap<>();
-
-    for(Book book : books){
-      ReadingStatus readingStatus = book.getReadingStatus();
-
-      booksByReadingStatus.computeIfAbsent(readingStatus, k-> new ArrayList<>())
-          .add(book);
-    }
-    return booksByReadingStatus;
-  }
-
-  public Map<Integer, List<Book>> getBooksSortedByYear(){
-
+  public Map<Genre, List<String>> getBooksByGenre() {
     return books
-         .stream()
-         .collect(Collectors.groupingBy(Book::getYear, TreeMap::new, Collectors.toList()));
+        .stream()
+        .collect(Collectors.groupingBy(Book::getGenre, mapping(Book::getTitle, toList())));
+  }
+
+  public Map<ReadingStatus, List<String>> getBooksByReadingStatus() {
+    return books.stream()
+            .collect(Collectors.groupingBy(Book::getReadingStatus, mapping(Book::getTitle, toList())));
+
+  }
+
+  public Map<Integer, List<Book>> getBooksSortedByYear() {
+    return books
+        .stream()
+        .collect(groupingBy(Book::getYear, TreeMap::new, Collectors.toList()));
   }
 
   public List<Author> getAllAuthors() {
-
     return authors;
   }
 
-  public Author findAuthorByBookTitle(String title){
-    Author author = new Author();
-    for(Book book : books){
-      if(book.getTitle().equalsIgnoreCase(title)){
-        author = book.getAuthor();
-      }
-    }
-    return author;
+  public Author findAuthorOfBookByTitle(String title) {
+   Optional <Author> author = books.stream()
+       .filter(b->b.getTitle().equals(title))
+       .map(Book::getAuthor).findFirst();
+
+    return author.orElseThrow(NullPointerException::new);
   }
 
-  public Map<Genre, Long> getNumberOfBooksForEachGenre(){
+  public Map<Genre, Long> getNumberOfBooksForEachGenre() {
     return books.stream()
-        .collect(Collectors.groupingBy(Book::getGenre, Collectors.counting()));
+        .collect(groupingBy(Book::getGenre, Collectors.counting()));
   }
 
   public Map<Genre, Long> getGenreWithBiggestNumberOfBooks() {
@@ -192,20 +163,24 @@ public Book findBookByTitleAndAuthorName(String title, String authorName){
     return Map.of(mostPopularGenre, max);
   }
 
-  public Map<Author, List<Book>> getBooksForGivenAuthor (String author) {
+  public Map<Author, List<Book>> getBooksForGivenAuthor(String authorName) {
 
-    return books
-        .stream()
-        .filter(book -> book.getAuthor().toString().equals(author))
-        .collect(Collectors.groupingBy(Book::getAuthor));
+    Optional<Book> author = books.stream().filter(b->b.getAuthor()
+        .getName().equals(authorName)).findFirst();
 
+    if(author.isPresent()) {
+      return books
+          .stream()
+          .filter(book -> book.getAuthor().getName().equals(authorName))
+          .collect(groupingBy(Book::getAuthor));
+    }
+throw new NullPointerException();
   }
 
-  public void setBookStatus(String title, ReadingStatus readingStatus){
-    for(Book book : books){
-      if(book.getTitle().equalsIgnoreCase(title)){
-        book.setReadingStatus(readingStatus);
-      }
-    }
+  public void setBookStatus(String title, ReadingStatus readingStatus) {
+    Optional<Book>book = books.stream()
+        .filter(b -> b.getTitle().equalsIgnoreCase(title))
+        .findFirst();
+       book.ifPresent(value -> value.setReadingStatus(readingStatus));
   }
 }
