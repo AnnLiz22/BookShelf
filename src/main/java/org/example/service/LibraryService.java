@@ -1,11 +1,15 @@
 package org.example.service;
 
+import static java.lang.String.valueOf;
+import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.mapping;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -146,21 +150,14 @@ public class LibraryService {
   }
 
   public Map<Genre, Long> getGenreWithBiggestNumberOfBooks() {
-
     Map<Genre, Long> genres = getNumberOfBooksForEachGenre();
+    Optional<Map.Entry<Genre, Long>> mostPopularGenre =
+        genres.entrySet().stream().max(Map.Entry.comparingByValue());
 
-    Genre mostPopularGenre = null;
-    Long max = Long.MIN_VALUE;
-
-    for (Map.Entry<Genre, Long> entry : genres.entrySet()) {
-
-      if (entry.getValue() > max) {
-        max = entry.getValue();
-        mostPopularGenre = entry.getKey();
-      }
-    }
-    assert mostPopularGenre != null;
-    return Map.of(mostPopularGenre, max);
+   return mostPopularGenre
+       .map(entry ->
+           Map.of(entry.getKey(), entry.getValue()))
+       .orElseThrow(NullPointerException::new);
   }
 
   public Map<Author, List<Book>> getBooksForGivenAuthor(String authorName) {
