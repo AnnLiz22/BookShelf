@@ -1,9 +1,11 @@
 package org.example.service;
 
+import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.example.model.Author;
@@ -116,25 +118,70 @@ public class LibraryServiceTest {
 
   @Test
   void findBookByTitle() {
+    Book book = new Book();
+    book.setTitle("new book");
+    book.setAuthor(new Author("Stephen"));
+    libraryService.addBook(book);
+    assertEquals(book.getTitle(), libraryService.findBookByTitle("new book").getTitle());
   }
 
-  @org.junit.jupiter.api.Test
+  @Test
+  void shouldFindBookByTitleAndThrowExceptionIfTitleExists(){
+    Book book = new Book();
+    book.setTitle("new book");
+    book.setAuthor(new Author("Stephen"));
+    libraryService.addBook(book);
+    Book book2 = new Book();
+    book2.setTitle("new book");
+    book2.setAuthor(new Author("Stephen King"));
+    libraryService.addBook(book2);
+    String title = book2.getTitle();
+    assertThrows(IllegalArgumentException.class, ()-> libraryService.findBookByTitle(title));
+  }
+
+  @Test
   void findBookByTitleAndAuthorName() {
+    String title = "Misery";
+    String authorName = "Stephen King";
+    assertEquals(title, libraryService
+        .findBookByTitleAndAuthorName("Misery", "Stephen King").getTitle());
+    assertEquals(authorName, libraryService
+        .findBookByTitleAndAuthorName("Misery", "Stephen King").getAuthor().getName());
   }
 
-  @org.junit.jupiter.api.Test
+  @Test
+  void shouldFindBookByTitleAndAuthorNameOrThrowException(){
+    assertThrows(NullPointerException.class, ()->
+        libraryService.findBookByTitleAndAuthorName("Misery", "No author"));
+    assertThrows(NullPointerException.class, ()->
+        libraryService.findBookByTitleAndAuthorName("", ""));
+    assertThrows(NullPointerException.class, ()->
+        libraryService.findBookByTitleAndAuthorName(null, null));
+
+  }
+
+  @Test
   void findBookByIsbn() {
+    Author author = new Author("James Joyce");
+    Book book = new Book("Ulisses", author, Genre.FICTION, 1234, "123454095" );
+    libraryService.addBook(book);
+    assertEquals(book.getIsbn(), libraryService.findBookByIsbn("123454095").getIsbn());
   }
 
-  @org.junit.jupiter.api.Test
+  @Test
   void getAllBooks() {
+    assertTrue(books.containsAll(libraryService.getAllBooks()));
   }
 
-  @org.junit.jupiter.api.Test
+  @Test
   void getBooksByAuthor() {
+  Map<Author, List<String>> booksByAuthor =  books.stream()
+        .collect(Collectors.groupingBy(Book::getAuthor,
+            Collectors.mapping(Book::getTitle, toList())));
+   assertEquals(booksByAuthor, libraryService.getBooksByAuthor());
   }
 
-  @org.junit.jupiter.api.Test
+  @Test
   void getBooksByGenre() {
   }
 
