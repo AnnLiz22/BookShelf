@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -11,6 +12,7 @@ import java.util.stream.Collectors;
 import org.example.model.Author;
 import org.example.model.Book;
 import org.example.model.Genre;
+import org.example.model.ReadingStatus;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -183,37 +185,60 @@ public class LibraryServiceTest {
 
   @Test
   void getBooksByGenre() {
+    Map<Genre, List<String>> result = libraryService.getBooksByGenre();
+    assertEquals(List.of("Clean Code", "The Clean Coder", "Effective Java"),
+        result.get(Genre.TECHNOLOGY));
   }
 
-  @org.junit.jupiter.api.Test
+  @Test
   void getBooksByReadingStatus() {
+    Map<ReadingStatus, List<String>> result = libraryService.getBooksByReadingStatus();
+    assertNull(result.get(ReadingStatus.FINISHED));
+    assertEquals((books.stream().map(Book::getTitle).toList()),
+        result.get(ReadingStatus.WANT_TO_READ));
   }
 
-  @org.junit.jupiter.api.Test
+  @Test
   void getBooksSortedByYear() {
+    Map<Integer, List<Book>> result = libraryService.getBooksSortedByYear();
   }
 
-  @org.junit.jupiter.api.Test
+  @Test
   void getAllAuthors() {
   }
 
   @Test
   void findAuthorOfBookByTitle() {
+    String title = "Clean Code";
+    assertEquals("Robert C. Martin",
+        libraryService.findAuthorOfBookByTitle(title).getName());
   }
 
   @Test
    void shouldCountBooksByGenre() {
+
+
   }
 
   @Test
   void getGenreWithBiggestNumberOfBooks() {
+    assertTrue(libraryService.getGenreWithBiggestNumberOfBooks().containsKey(Genre.FICTION));
+    assertTrue(libraryService.getGenreWithBiggestNumberOfBooks().containsValue(6L));
+
   }
 
   @org.junit.jupiter.api.Test
   void getBooksForGivenAuthor() {
+    Map<Author, List<String>> expected = new HashMap<>();
+
+    Author author = new Author("Stephen King");
+    List <String> booksOfAuthor = List.of("Misery");
+    expected.put(author, booksOfAuthor );
+    assertEquals(expected.keySet().toString(), libraryService.getBooksForGivenAuthor("Stephen King").keySet().toString());
+    assertEquals(expected.size(), libraryService.getBooksForGivenAuthor("Stephen King").size());
   }
 
-  @org.junit.jupiter.api.Test
+  @Test
   void setBookStatus() {
   }
 
