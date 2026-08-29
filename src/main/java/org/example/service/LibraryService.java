@@ -122,10 +122,11 @@ public class LibraryService {
 
   }
 
-  public Map<Integer, List<Book>> getBooksSortedByYear() {
-    return books
-        .stream()
-        .collect(groupingBy(Book::getYear, TreeMap::new, Collectors.toList()));
+  public List<Book> getBooksSortedByYear() {
+    List<Book> sortedByYear = new ArrayList<>(books);
+    sortedByYear.sort(Comparator.comparingInt(Book::getYear));
+     return sortedByYear;
+
   }
 
   public List<Author> getAllAuthors() {
