@@ -1,9 +1,13 @@
 package org.example.service;
 
+import static java.util.stream.Collectors.counting;
+import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -11,6 +15,7 @@ import java.util.stream.Collectors;
 import org.example.model.Author;
 import org.example.model.Book;
 import org.example.model.Genre;
+import org.example.model.ReadingStatus;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +30,7 @@ public class LibraryServiceTest {
   void setUp() {
     libraryService = new LibraryService();
     books = createBooks();
-    authors = createBooks().stream().map(Book::getAuthor).toList();
+    authors = createBooks().stream().map(Book::getAuthor).distinct().toList();
     for(Book book : books){
       libraryService.addBook(book);
     }
@@ -63,10 +68,11 @@ public class LibraryServiceTest {
 
   }
   @Test
-  void shouldNotCreateNewAuthorIfAuthorExists(){
+  void shouldNotCreateNewAuthorIfAuthorExistsAndAddNewBook(){
     Author author = new Author("Stephen King");
     Book book = new Book("The Shining", author, Genre.FICTION, 1977, "123454");
     libraryService.addBook(book);
+    assertTrue(libraryService.getAllBooks().contains(book));
     assertEquals(books.stream().map(Book::getAuthor).collect(Collectors.toSet()).size(),
         libraryService.getAllAuthors().size());
   }
@@ -85,6 +91,22 @@ public class LibraryServiceTest {
   }
 
   @Test
+  void shouldThrowExceptionIfAuthorIsNull(){
+    assertThrows(NullPointerException.class, ()->libraryService.addAuthor(null));
+  }
+@Test
+void shouldThrowExceptionIfAuthorNameIsEmpty() {
+    Author author = new Author();
+    author.setName("");
+  assertThrows(NullPointerException.class, ()->libraryService.addAuthor(author));
+}
+@Test
+void shouldThrowExceptionIfAuthorNameIsNull() {
+    Author author = new Author();
+  assertThrows(NullPointerException.class, ()->libraryService.addAuthor(author));
+
+}
+  @Test
   void shouldRemoveBookByTitle() {
     libraryService.removeBookByTitle("Clean Code");
     assertTrue(libraryService.getAllBooks()
@@ -94,8 +116,19 @@ public class LibraryServiceTest {
 
   }
 
+@Test
+void shouldThrowExceptionIfTitleIsNull() {
+  assertThrows(NullPointerException.class, ()->libraryService.removeBookByTitle(null));
+  }
 
-  @Test
+ @Test
+ void shouldThrowExceptionIfTitleIsEmpty() {
+    assertThrows(NullPointerException.class, ()->libraryService.removeBookByTitle(""));
+   assertThrows(NullPointerException.class, ()->libraryService.removeBookByTitle(" "));
+
+ }
+
+   @Test
   void removeBookByTitleAndAuthor() {
     libraryService.removeBookByTitleAndAuthor("Misery", "Stephen King");
 
@@ -183,39 +216,82 @@ public class LibraryServiceTest {
 
   @Test
   void getBooksByGenre() {
+    Map<Genre, List<String>> result = libraryService.getBooksByGenre();
+    assertEquals(List.of("Clean Code", "The Clean Coder", "Effective Java"),
+        result.get(Genre.TECHNOLOGY));
   }
 
-  @org.junit.jupiter.api.Test
+  @Test
   void getBooksByReadingStatus() {
+    Map<ReadingStatus, List<String>> result = libraryService.getBooksByReadingStatus();
+    assertNull(result.get(ReadingStatus.FINISHED));
+    assertEquals((books.stream().map(Book::getTitle).toList()),
+        result.get(ReadingStatus.WANT_TO_READ));
   }
 
-  @org.junit.jupiter.api.Test
+  @Test
   void getBooksSortedByYear() {
+   List<Book> result = libraryService.getBooksSortedByYear();
+   List <Book> expected = new ArrayList<>(books);
+   expected.sort(Comparator.comparingInt(Book::getYear));
+   assertEquals(expected, result);
   }
 
-  @org.junit.jupiter.api.Test
+  @Test
   void getAllAuthors() {
+    String result = libraryService.getAllAuthors().toString();
+    String expected = authors.toString();
+    assertEquals(expected, result);
+
   }
 
   @Test
   void findAuthorOfBookByTitle() {
+    String title = "Clean Code";
+    assertEquals("Robert C. Martin",
+        libraryService.findAuthorOfBookByTitle(title).getName());
   }
 
   @Test
    void shouldCountBooksByGenre() {
+    Map<Genre, Long> result = libraryService.getNumberOfBooksForEachGenre();
+    Map<Genre, Long> expected = books.stream().collect(groupingBy(Book::getGenre, counting()));
+    assertEquals(expected, result);
   }
 
   @Test
   void getGenreWithBiggestNumberOfBooks() {
+    assertTrue(libraryService.getGenreWithBiggestNumberOfBooks().containsKey(Genre.FICTION));
+    assertTrue(libraryService.getGenreWithBiggestNumberOfBooks().containsValue(6L));
   }
 
-  @org.junit.jupiter.api.Test
+  @Test
   void getBooksForGivenAuthor() {
+    Map<Author, List<String>> expected = new HashMap<>();
+    Author author = new Author("Stephen King");
+    List <String> booksOfAuthor = List.of("Misery");
+    expected.put(author, booksOfAuthor );
+    assertEquals(expected.keySet().toString(), libraryService.getBooksForGivenAuthor("Stephen King").keySet().toString());
+    assertEquals(expected.size(), libraryService.getBooksForGivenAuthor("Stephen King").size());
   }
 
-  @org.junit.jupiter.api.Test
+  @Test
   void setBookStatus() {
+    Book book =
+        libraryService.getAllBooks()
+            .stream()
+            .filter(b->b.getTitle().equalsIgnoreCase("Clean Code")).findFirst().orElseThrow();
+
+
+    libraryService.setBookStatus("Clean Code", ReadingStatus.READING);
+    assertEquals(ReadingStatus.READING, book.getReadingStatus());
   }
+
+  @Test
+  void shouldThrowExceptionIfSetReadingStatusForDuplicatedTitle(){
+    assertThrows(IllegalArgumentException.class, ()->libraryService.setBookStatus("Misery", ReadingStatus.READING));
+  }
+
 
   private static List<Book> createBooks(){
 
