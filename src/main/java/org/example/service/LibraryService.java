@@ -39,7 +39,9 @@ public class LibraryService {
   }
 
   public void addAuthor(Author author) {
-
+    if(author == null || author.getName().isBlank() || author.getName()==null){
+      throw new NullPointerException("Author cannot be null");
+    }
     boolean exists = authors.stream()
         .anyMatch(a -> a.getName().equalsIgnoreCase(author.getName()));
 
@@ -54,6 +56,9 @@ public class LibraryService {
   }
 
   public void removeBookByTitle(String title) {
+    if(title==null || title.isBlank()){
+      throw new NullPointerException("Title is null");
+    }
     books.removeIf(book -> book.getTitle().equalsIgnoreCase(title));
   }
 
@@ -172,6 +177,16 @@ throw new NullPointerException();
   }
 
   public void setBookStatus(String title, ReadingStatus readingStatus) {
+
+    Long booksWithGivenTitle = books
+        .stream()
+        .filter(b -> b.getTitle()
+            .equalsIgnoreCase(title)).count();
+
+    if (booksWithGivenTitle > 1) {
+      throw new IllegalArgumentException("Duplicated");
+    }
+
     Optional<Book>book = books.stream()
         .filter(b -> b.getTitle().equalsIgnoreCase(title))
         .findFirst();
