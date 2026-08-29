@@ -10,15 +10,10 @@ public class Author {
   }
 
   public Author(String name) {
-    if(name==null||name.isBlank()){
+    if(name == null || name.isBlank()){
       throw new IllegalArgumentException();
     }
     this.id = nextId;
-    this.name = name;
-  }
-
-  public Author(int id, String name) {
-    this.id = id;
     this.name = name;
   }
 
