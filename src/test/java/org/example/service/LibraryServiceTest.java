@@ -1,9 +1,12 @@
 package org.example.service;
 
+import static java.util.stream.Collectors.counting;
+import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +30,7 @@ public class LibraryServiceTest {
   void setUp() {
     libraryService = new LibraryService();
     books = createBooks();
-    authors = createBooks().stream().map(Book::getAuthor).toList();
+    authors = createBooks().stream().map(Book::getAuthor).distinct().toList();
     for(Book book : books){
       libraryService.addBook(book);
     }
@@ -200,11 +203,18 @@ public class LibraryServiceTest {
 
   @Test
   void getBooksSortedByYear() {
-    Map<Integer, List<Book>> result = libraryService.getBooksSortedByYear();
+   List<Book> result = libraryService.getBooksSortedByYear();
+   List <Book> expected = new ArrayList<>(books);
+   expected.sort(Comparator.comparingInt(Book::getYear));
+   assertEquals(expected, result);
   }
 
   @Test
   void getAllAuthors() {
+    String result = libraryService.getAllAuthors().toString();
+    String expected = authors.toString();
+    assertEquals(expected, result);
+
   }
 
   @Test
@@ -216,21 +226,20 @@ public class LibraryServiceTest {
 
   @Test
    void shouldCountBooksByGenre() {
-
-
+    Map<Genre, Long> result = libraryService.getNumberOfBooksForEachGenre();
+    Map<Genre, Long> expected = books.stream().collect(groupingBy(Book::getGenre, counting()));
+    assertEquals(expected, result);
   }
 
   @Test
   void getGenreWithBiggestNumberOfBooks() {
     assertTrue(libraryService.getGenreWithBiggestNumberOfBooks().containsKey(Genre.FICTION));
     assertTrue(libraryService.getGenreWithBiggestNumberOfBooks().containsValue(6L));
-
   }
 
-  @org.junit.jupiter.api.Test
+  @Test
   void getBooksForGivenAuthor() {
     Map<Author, List<String>> expected = new HashMap<>();
-
     Author author = new Author("Stephen King");
     List <String> booksOfAuthor = List.of("Misery");
     expected.put(author, booksOfAuthor );
@@ -240,6 +249,14 @@ public class LibraryServiceTest {
 
   @Test
   void setBookStatus() {
+    libraryService.setBookStatus("Misery", ReadingStatus.READING);
+
+    Book book =
+        libraryService.getAllBooks()
+            .stream()
+            .filter(b->b.getTitle().equalsIgnoreCase("Misery")).findFirst().orElseThrow();
+
+    assertEquals(ReadingStatus.READING, book.getReadingStatus());
   }
 
   private static List<Book> createBooks(){
