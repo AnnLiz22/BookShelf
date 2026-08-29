@@ -68,10 +68,11 @@ public class LibraryServiceTest {
 
   }
   @Test
-  void shouldNotCreateNewAuthorIfAuthorExists(){
+  void shouldNotCreateNewAuthorIfAuthorExistsAndAddNewBook(){
     Author author = new Author("Stephen King");
     Book book = new Book("The Shining", author, Genre.FICTION, 1977, "123454");
     libraryService.addBook(book);
+    assertTrue(libraryService.getAllBooks().contains(book));
     assertEquals(books.stream().map(Book::getAuthor).collect(Collectors.toSet()).size(),
         libraryService.getAllAuthors().size());
   }
@@ -90,6 +91,22 @@ public class LibraryServiceTest {
   }
 
   @Test
+  void shouldThrowExceptionIfAuthorIsNull(){
+    assertThrows(NullPointerException.class, ()->libraryService.addAuthor(null));
+  }
+@Test
+void shouldThrowExceptionIfAuthorNameIsEmpty() {
+    Author author = new Author();
+    author.setName("");
+  assertThrows(NullPointerException.class, ()->libraryService.addAuthor(author));
+}
+@Test
+void shouldThrowExceptionIfAuthorNameIsNull() {
+    Author author = new Author();
+  assertThrows(NullPointerException.class, ()->libraryService.addAuthor(author));
+
+}
+  @Test
   void shouldRemoveBookByTitle() {
     libraryService.removeBookByTitle("Clean Code");
     assertTrue(libraryService.getAllBooks()
@@ -99,8 +116,19 @@ public class LibraryServiceTest {
 
   }
 
+@Test
+void shouldThrowExceptionIfTitleIsNull() {
+  assertThrows(NullPointerException.class, ()->libraryService.removeBookByTitle(null));
+  }
 
-  @Test
+ @Test
+ void shouldThrowExceptionIfTitleIsEmpty() {
+    assertThrows(NullPointerException.class, ()->libraryService.removeBookByTitle(""));
+   assertThrows(NullPointerException.class, ()->libraryService.removeBookByTitle(" "));
+
+ }
+
+   @Test
   void removeBookByTitleAndAuthor() {
     libraryService.removeBookByTitleAndAuthor("Misery", "Stephen King");
 
@@ -249,15 +277,21 @@ public class LibraryServiceTest {
 
   @Test
   void setBookStatus() {
-    libraryService.setBookStatus("Misery", ReadingStatus.READING);
-
     Book book =
         libraryService.getAllBooks()
             .stream()
-            .filter(b->b.getTitle().equalsIgnoreCase("Misery")).findFirst().orElseThrow();
+            .filter(b->b.getTitle().equalsIgnoreCase("Clean Code")).findFirst().orElseThrow();
 
+
+    libraryService.setBookStatus("Clean Code", ReadingStatus.READING);
     assertEquals(ReadingStatus.READING, book.getReadingStatus());
   }
+
+  @Test
+  void shouldThrowExceptionIfSetReadingStatusForDuplicatedTitle(){
+    assertThrows(IllegalArgumentException.class, ()->libraryService.setBookStatus("Misery", ReadingStatus.READING));
+  }
+
 
   private static List<Book> createBooks(){
 
