@@ -9,7 +9,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
 import org.example.model.Author;
 import org.example.model.Book;
@@ -63,6 +62,9 @@ public class LibraryService {
   }
 
   public void removeBookByTitleAndAuthor(String title, String authorName) {
+    if(authorName==null || authorName.isBlank()){
+      throw new NullPointerException("Author name is null");
+    }
     Book book = findBookByTitleAndAuthorName(title, authorName);
     books.remove(book);
   }
@@ -103,6 +105,10 @@ public class LibraryService {
   }
 
   public List<Book> getAllBooks() {
+
+    if(books.isEmpty()){
+      throw new NullPointerException();
+    }
    return books.stream().sorted(Comparator.comparing(Book::getTitle)).toList();
   }
 
