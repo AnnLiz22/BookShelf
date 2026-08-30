@@ -238,6 +238,12 @@ void shouldThrowExceptionIfTitleIsNull() {
   }
 
   @Test
+  void shouldThrowExceptionIfAuthorsListIsEmpty(){
+    libraryService = new LibraryService();
+    assertThrows(NullPointerException.class, ()->libraryService.getBooksByAuthor());
+  }
+
+  @Test
   void getBooksByGenre() {
     Map<Genre, List<String>> result = libraryService.getBooksByGenre();
     assertEquals(List.of("Clean Code", "The Clean Coder", "Effective Java"),
