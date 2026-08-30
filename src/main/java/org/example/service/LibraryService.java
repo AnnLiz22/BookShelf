@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 import org.example.model.Author;
 import org.example.model.Book;
@@ -113,12 +114,13 @@ public class LibraryService {
   }
 
   public Map<Author, List<String>> getBooksByAuthor() {
-      Optional <Author> author = authors.stream().findFirst();
-      if(author.isPresent()) {
+  List<Author> list =  books.stream().map(Book::getAuthor).toList();
+  if(list.isEmpty()){
+    throw new NullPointerException();
+  }
         return books.stream()
             .collect(Collectors.groupingBy(Book::getAuthor, mapping(Book::getTitle, toList())));
-      }
-      throw new NullPointerException();
+
   }
 
   public Map<Genre, List<String>> getBooksByGenre() {
