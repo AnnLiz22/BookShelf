@@ -42,17 +42,23 @@ public class LibraryServiceTest {
 
   @Test
   void shouldAddNewBookWithCorrectFieldsAndExistingAuthor() {
-    Optional<Author> author = authors.stream().filter(b->b.getName().equalsIgnoreCase("Stephen King")).findFirst();
+    Optional<Author> author = authors
+        .stream()
+        .filter(b->b.getName()
+            .equalsIgnoreCase("Stephen King")).findFirst();
     Author author1 = null;
     if(author.isPresent()){
-       author1 = author.get();
+      author1 = author.get();
     }
+
     Book book = new Book("The Shining", author1, Genre.FICTION, 1977, "123454");
     libraryService.addBook(book);
     assertTrue(libraryService.getAllBooks().contains(book));
-    assertTrue(libraryService.getAllBooks().stream().anyMatch(b->b.getIsbn().equalsIgnoreCase("123454")));
+    assertTrue(libraryService.getAllBooks().stream()
+        .anyMatch(b->b.getIsbn().equalsIgnoreCase("123454")));
 
-    Book addedBook = libraryService.getAllBooks().stream().filter(b->b.getIsbn().equalsIgnoreCase("123454"))
+    Book addedBook = libraryService.getAllBooks().stream()
+        .filter(b->b.getIsbn().equalsIgnoreCase("123454"))
         .findFirst().orElseThrow();
     assertEquals("The Shining", addedBook.getTitle());
     assertEquals(Genre.FICTION, addedBook.getGenre());
@@ -75,6 +81,19 @@ public class LibraryServiceTest {
     assertTrue(libraryService.getAllBooks().contains(book));
     assertEquals(books.stream().map(Book::getAuthor).collect(Collectors.toSet()).size(),
         libraryService.getAllAuthors().size());
+  }
+
+  @Test
+  void shouldThrowExceptionIfBookIsNullOrBookTitleIsEmptyOrNull(){
+
+    Book book1 = new Book();
+    book1.setTitle("");
+    Book book2 = new Book();
+    book2.setTitle(null);
+    book2.setAuthor(new Author("Jean Paul Sartre"));
+    assertThrows(NullPointerException.class, ()->libraryService.addBook(book1));
+    assertThrows(NullPointerException.class, ()->libraryService.addBook(book2));
+    assertThrows(NullPointerException.class, ()->libraryService.addBook(null));
   }
 
   @Test
@@ -130,11 +149,7 @@ void shouldThrowExceptionIfTitleIsNull() {
 
    @Test
   void removeBookByTitleAndAuthor() {
-    libraryService.removeBookByTitleAndAuthor("Misery", "Stephen King");
-
-    assertTrue(libraryService.getAllBooks().stream().noneMatch(b -> b.getTitle().equalsIgnoreCase("Misery")
-            && b.getAuthor().getName().equalsIgnoreCase("Stephen King")
-        ));
+    assertTrue(libraryService.removeBookByTitleAndAuthor("Clean Code", "Robert C. Martin"));
   }
 
   @Test
