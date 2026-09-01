@@ -42,17 +42,23 @@ public class LibraryServiceTest {
 
   @Test
   void shouldAddNewBookWithCorrectFieldsAndExistingAuthor() {
-    Optional<Author> author = authors.stream().filter(b->b.getName().equalsIgnoreCase("Stephen King")).findFirst();
+    Optional<Author> author = authors
+        .stream()
+        .filter(b->b.getName()
+            .equalsIgnoreCase("Stephen King")).findFirst();
     Author author1 = null;
     if(author.isPresent()){
-       author1 = author.get();
+      author1 = author.get();
     }
+
     Book book = new Book("The Shining", author1, Genre.FICTION, 1977, "123454");
     libraryService.addBook(book);
     assertTrue(libraryService.getAllBooks().contains(book));
-    assertTrue(libraryService.getAllBooks().stream().anyMatch(b->b.getIsbn().equalsIgnoreCase("123454")));
+    assertTrue(libraryService.getAllBooks().stream()
+        .anyMatch(b->b.getIsbn().equalsIgnoreCase("123454")));
 
-    Book addedBook = libraryService.getAllBooks().stream().filter(b->b.getIsbn().equalsIgnoreCase("123454"))
+    Book addedBook = libraryService.getAllBooks().stream()
+        .filter(b->b.getIsbn().equalsIgnoreCase("123454"))
         .findFirst().orElseThrow();
     assertEquals("The Shining", addedBook.getTitle());
     assertEquals(Genre.FICTION, addedBook.getGenre());
@@ -75,6 +81,19 @@ public class LibraryServiceTest {
     assertTrue(libraryService.getAllBooks().contains(book));
     assertEquals(books.stream().map(Book::getAuthor).collect(Collectors.toSet()).size(),
         libraryService.getAllAuthors().size());
+  }
+
+  @Test
+  void shouldThrowExceptionIfBookIsNullOrBookTitleIsEmptyOrNull(){
+
+    Book book1 = new Book();
+    book1.setTitle("");
+    Book book2 = new Book();
+    book2.setTitle(null);
+    book2.setAuthor(new Author("Jean Paul Sartre"));
+    assertThrows(NullPointerException.class, ()->libraryService.addBook(book1));
+    assertThrows(NullPointerException.class, ()->libraryService.addBook(book2));
+    assertThrows(NullPointerException.class, ()->libraryService.addBook(null));
   }
 
   @Test
@@ -130,11 +149,19 @@ void shouldThrowExceptionIfTitleIsNull() {
 
    @Test
   void removeBookByTitleAndAuthor() {
-    libraryService.removeBookByTitleAndAuthor("Misery", "Stephen King");
+    assertTrue(libraryService.removeBookByTitleAndAuthor("Clean Code", "Robert C. Martin"));
+  }
 
-    assertTrue(libraryService.getAllBooks().stream().noneMatch(b -> b.getTitle().equalsIgnoreCase("Misery")
-            && b.getAuthor().getName().equalsIgnoreCase("Stephen King")
-        ));
+  @Test
+  void shouldThrowExceptionIfAuthorForTitleIsNull(){
+    assertThrows(NullPointerException.class,
+        ()->libraryService.removeBookByTitleAndAuthor("Misery", null));
+  }
+
+  @Test
+  void shouldThrowExceptionIfAuthorForTitleIsEmpty(){
+    assertThrows(NullPointerException.class,
+        ()->libraryService.removeBookByTitleAndAuthor("Misery", ""));
   }
 
   @Test
@@ -148,9 +175,13 @@ void shouldThrowExceptionIfTitleIsNull() {
             .getTitle().equalsIgnoreCase("new book")).findFirst().orElseThrow();
     assertEquals(book.getTitle(), libraryService.findBookById(addedBook.getId()).getTitle());
   }
+  @Test
+  void shouldThrowExceptionIfBookByIdNotFound(){
+    assertThrows(NullPointerException.class, ()->libraryService.findBookById(20));
+  }
 
   @Test
-  void findBookByTitle() {
+  void shouldFindBookByTitle() {
     Book book = new Book();
     book.setTitle("new book");
     book.setAuthor(new Author("Stephen"));
@@ -159,21 +190,17 @@ void shouldThrowExceptionIfTitleIsNull() {
   }
 
   @Test
-  void shouldFindBookByTitleAndThrowExceptionIfTitleExists(){
-    Book book = new Book();
-    book.setTitle("new book");
-    book.setAuthor(new Author("Stephen"));
-    libraryService.addBook(book);
-    Book book2 = new Book();
-    book2.setTitle("new book");
-    book2.setAuthor(new Author("Stephen King"));
-    libraryService.addBook(book2);
-    String title = book2.getTitle();
-    assertThrows(IllegalArgumentException.class, ()-> libraryService.findBookByTitle(title));
+  void shouldThrowExceptionIfBookByTitleNotFound(){
+    assertThrows(NullPointerException.class, ()-> libraryService.findBookByTitle("not on bookshelf"));
   }
 
   @Test
-  void findBookByTitleAndAuthorName() {
+  void shouldFindBookByTitleAndThrowExceptionIfTitleIsDuplicated(){
+    assertThrows(IllegalArgumentException.class, ()-> libraryService.findBookByTitle("Misery"));
+  }
+
+  @Test
+  void shouldFindBookByTitleAndAuthorName() {
     String title = "Misery";
     String authorName = "Stephen King";
     assertEquals(title, libraryService
@@ -194,7 +221,7 @@ void shouldThrowExceptionIfTitleIsNull() {
   }
 
   @Test
-  void findBookByIsbn() {
+  void shouldFindBookByIsbn() {
     Author author = new Author("James Joyce");
     Book book = new Book("Ulisses", author, Genre.FICTION, 1234, "123454095" );
     libraryService.addBook(book);
@@ -202,8 +229,19 @@ void shouldThrowExceptionIfTitleIsNull() {
   }
 
   @Test
-  void getAllBooks() {
+  void shouldThrowExceptionIfIsbnNotFound(){
+    assertThrows(NullPointerException.class, ()->libraryService.findBookByIsbn("abcd"));
+  }
+
+  @Test
+  void shouldPrintAllBooksSorted() {
     assertTrue(books.containsAll(libraryService.getAllBooks()));
+  }
+
+  @Test
+  void shouldThrowExceptionIfBooksIsEmpty(){
+    libraryService = new LibraryService();
+    assertThrows(NullPointerException.class, () -> libraryService.getAllBooks());
   }
 
   @Test
@@ -212,6 +250,12 @@ void shouldThrowExceptionIfTitleIsNull() {
         .collect(Collectors.groupingBy(Book::getAuthor,
             Collectors.mapping(Book::getTitle, toList())));
    assertEquals(booksByAuthor, libraryService.getBooksByAuthor());
+  }
+
+  @Test
+  void shouldThrowExceptionIfAuthorsListIsEmpty(){
+    libraryService = new LibraryService();
+    assertThrows(NullPointerException.class, ()->libraryService.getBooksByAuthor());
   }
 
   @Test
