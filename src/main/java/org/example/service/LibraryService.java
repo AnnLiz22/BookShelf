@@ -9,7 +9,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
 import org.example.model.Author;
 import org.example.model.Book;
@@ -22,19 +21,19 @@ public class LibraryService {
   private final List<Author> authors = new ArrayList<>();
 
   public void addBook(Book book) {
-
+    if (book == null || book.getTitle().isBlank() || book.getTitle() == null) {
+      throw new NullPointerException();
+    }
+    Author author = authors.stream()
+        .filter(a -> a.getName().equalsIgnoreCase(book.getAuthor().getName()))
+        .findFirst().orElse(book.getAuthor());
+    book.setAuthor(author);
     books.add(book);
 
     boolean isNotInCatalogue = authors.stream()
         .noneMatch(a -> a.getName().equalsIgnoreCase(book.getAuthor().getName()));
     if (isNotInCatalogue) {
       authors.add(book.getAuthor());
-    }
-    if (!isNotInCatalogue) {
-      Optional<Book> book1 = books.stream()
-          .filter(b -> b.getAuthor().getName().equalsIgnoreCase(book.getAuthor().getName()))
-          .findFirst();
-      book.setAuthor(book1.orElseThrow().getAuthor());
     }
   }
 
@@ -62,12 +61,12 @@ public class LibraryService {
     books.removeIf(book -> book.getTitle().equalsIgnoreCase(title));
   }
 
-  public void removeBookByTitleAndAuthor(String title, String authorName) {
+  public boolean removeBookByTitleAndAuthor(String title, String authorName) {
     if(authorName==null || authorName.isBlank()){
       throw new NullPointerException("Author name is null");
     }
     Book book = findBookByTitleAndAuthorName(title, authorName);
-    books.remove(book);
+   return books.remove(book);
   }
 
   public Book findBookById(int id) {
