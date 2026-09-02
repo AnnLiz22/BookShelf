@@ -199,4 +199,11 @@ throw new NullPointerException();
         .findFirst();
        book.ifPresent(value -> value.setReadingStatus(readingStatus));
   }
+
+  public void setBookStatus(String title, String authorName, ReadingStatus readingStatus) {
+    Book book = books.stream().filter(book1 ->
+    book1.getTitle().equalsIgnoreCase(title) &&
+    book1.getAuthor().getName().equalsIgnoreCase(authorName)).findFirst().orElseThrow();
+    book.setReadingStatus(readingStatus);
+  }
 }
