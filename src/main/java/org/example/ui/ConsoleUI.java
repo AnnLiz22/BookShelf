@@ -47,9 +47,11 @@ public class ConsoleUI {
      }
      default -> System.out.println("Invalid option.");
    }
-  }}
+  }
+  }
  //helpers:
  private int readInt() {
+
   while (true) {
    System.out.print("Choose an option: ");
 
@@ -109,7 +111,7 @@ public class ConsoleUI {
   private void showAllAuthors(){
     List<Author> authors = libraryService.getAllAuthors();
     if (authors.isEmpty()) {
-      System.out.println("No books found");
+      System.out.println("No authors found");
       return;
     }
    System.out.println("========== Authors ==========");
@@ -137,7 +139,7 @@ public class ConsoleUI {
   }
 
   private void showBooksByYear(){
-   Map<Integer, List<Book>> booksByYear = libraryService.getBooksSortedByYear();
+   List<Book> booksByYear = libraryService.getBooksSortedByYear();
     if (booksByYear.isEmpty()) {
       System.out.println("No books found");
       return;
@@ -149,6 +151,7 @@ public class ConsoleUI {
   private void showAuthorForGivenBookTitle(){
    System.out.println("Choose title: ");
    String title = scanner.nextLine();
+
    try {
      Author author = libraryService.findAuthorOfBookByTitle(title);
      System.out.println("Author of " + title + ": " + author);
@@ -182,7 +185,8 @@ public class ConsoleUI {
       System.out.println("Book author: ");
       String authorName = scanner.nextLine();
 
-      System.out.println("Book genre:\n BIOGRAPHY, FICTION, FANTASY, HISTORY, SCIENCE, TECHNOLOGY, OTHER");
+      System.out.println("Choose book genre: ");
+      List.of(Genre.values()).forEach(System.out::println);
       Genre genre = Genre.valueOf(scanner.nextLine().toUpperCase());
 
       System.out.println("Book isbn: ");
@@ -208,15 +212,15 @@ public class ConsoleUI {
 
     try {
       author = new Author(authorName);
+      libraryService.addAuthor(author);
     } catch (Exception e) {
-      System.out.println("Incorrect author name");
+      System.out.println("Incorrect author name or author already exists.");
       return;
     }
       System.out.println("Do you want to add book for this author? [YES/NO]");
       String response = scanner.nextLine().trim().toUpperCase();
 
     if(response.equalsIgnoreCase("NO")) {
-      libraryService.addAuthor(author);
       System.out.println("Author: " + author + " added.");
       return;
     }
@@ -224,8 +228,9 @@ public class ConsoleUI {
     while (response.equals("YES")) {
         System.out.println("Book title: ");
         String title = scanner.nextLine();
-        System.out.println("Genre: \n BIOGRAPHY, FICTION, FANTASY, HISTORY, SCIENCE, TECHNOLOGY, OTHER");
-        Genre genre = Genre.valueOf(scanner.nextLine().toUpperCase());
+      System.out.println("Choose book genre: ");
+      List.of(Genre.values()).forEach(System.out::println);
+      Genre genre = Genre.valueOf(scanner.nextLine().toUpperCase());
 
         System.out.println("isbn:");
         String isbn = scanner.nextLine();
@@ -240,22 +245,33 @@ public class ConsoleUI {
     }
   }
 
-  private void setReadingStatusForBookFromLibrary(){
+  private void setReadingStatusForBookFromLibrary() {
     System.out.println("Tape the book title: ");
+    Book book;
     String title = scanner.nextLine();
     try {
-     Book book = libraryService.findBookByTitle(title);
+      book = libraryService.findBookByTitle(title);
       System.out.println("Set the status to: \n [WANT_TO_READ, READING, FINISHED, ABANDONED]");
       ReadingStatus status = ReadingStatus
           .valueOf(scanner.nextLine().toUpperCase().replace(" ", "_"));
       libraryService.setBookStatus(book.getTitle(), status);
       System.out.println(book);
 
-    } catch (Exception e) {
-      System.out.println("The selected title not on the Book Shelf.");
+    } catch (IllegalArgumentException e) {
+      System.out.println("The selected title appears more then once. Give the author name.");
+      try {
+        String authorName = scanner.nextLine();
+        book = libraryService.findBookByTitleAndAuthorName(title, authorName);
+        System.out.println("Set the status to: \n [WANT_TO_READ, READING, FINISHED, ABANDONED]");
+        ReadingStatus status = ReadingStatus
+            .valueOf(scanner.nextLine().toUpperCase().replace(" ", "_"));
+        libraryService.setBookStatus(book.getTitle(), authorName, status);
+        System.out.println(book);
+      } catch (NullPointerException ex) {
+        System.out.println("Incorrect author");
+      }
     }
   }
-
   private void removeBookFromYourBookShelf() {
 
     System.out.println("Give the book title: ");
