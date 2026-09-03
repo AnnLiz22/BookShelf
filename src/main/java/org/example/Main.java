@@ -9,13 +9,13 @@ import org.example.ui.ConsoleUI;
 public class Main {
   public static void main(String[] args) {
 
-    Author author1 = new Author(1, "Robert C. Martin");
-    Author author2 = new Author(2, "Joshua Bloch");
-    Author author3 = new Author(3, "J.K. Rowling");
-    Author author4 = new Author(4, "J.R.R. Tolkien");
-    Author author5 = new Author(5, "George Orwell");
-    Author author6 = new Author(6, "Fyodor Dostoevsky");
-    Author author7 = new Author(7, "Stephen King");
+    Author author1 = new Author( "Robert C. Martin");
+    Author author2 = new Author( "Joshua Bloch");
+    Author author3 = new Author( "J.K. Rowling");
+    Author author4 = new Author( "J.R.R. Tolkien");
+    Author author5 = new Author( "George Orwell");
+    Author author6 = new Author("Fyodor Dostoevsky");
+    Author author7 = new Author( "Stephen King");
 
     Book book1 = new Book(
         1,
@@ -107,7 +107,7 @@ public class Main {
         "9780374528379"
     );
 
-    Book book11 = new Book(
+   Book book11 = new Book(
         11,
         "Misery",
         author7,
@@ -138,11 +138,11 @@ public class Main {
     libraryService.addBook(book10);
     libraryService.addBook(book11);
     libraryService.addBook(book12);
-    //System.out.println(libraryService.findBookByTitle("Miser"));
-   // System.out.println(libraryService.findBookByTitle("Misery"));
-    //System.out.println(libraryService.findBookByIsbn("9780143058144"));
-    //System.out.println(libraryService
-      //  .findBookByTitleAndAuthorName("Crime and Punishment","Fyodor Dostoevsky"));
+    System.out.println(libraryService.findBookByTitle("Miser"));
+    System.out.println(libraryService.findBookByTitle("Misery"));
+    System.out.println(libraryService.findBookByIsbn("9780143058144"));
+    System.out.println(libraryService
+        .findBookByTitleAndAuthorName("Crime and Punishment","Fyodor Dostoevsky"));
 
     ConsoleUI consoleUI = new ConsoleUI(libraryService);
     consoleUI.start();
