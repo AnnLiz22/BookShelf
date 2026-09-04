@@ -1,5 +1,10 @@
 package org.example.model;
 
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
 public class Book {
   private static int nextId = 1;
   private int id;
@@ -29,6 +34,12 @@ public class Book {
 
     if (title == null || title.isBlank()) {
       throw new IllegalArgumentException("Title cannot be null or empty");
+    }
+    if(year > LocalDate.now().getYear()){
+      throw new IllegalArgumentException("Wrong year");
+    }
+    if(!List.of(Genre.values()).contains(genre)){
+      throw new IllegalArgumentException("Wrong genre");
     }
     this.id = nextId++;
     this.title = title;
