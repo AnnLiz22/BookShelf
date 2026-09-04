@@ -10,7 +10,7 @@ public class Author {
   }
 
   public Author(String name) {
-    if(name == null || name.isBlank()){
+    if(name == null || name.isBlank() || name.length() < 2){
       throw new IllegalArgumentException();
     }
     this.id = nextId;

@@ -1,5 +1,6 @@
 package org.example.ui;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -63,32 +64,14 @@ public class ConsoleUI {
   }
  }
 
-
  private void printMenu() {
-
    System.out.println();
    System.out.println("====================================");
    System.out.println("          📚 BOOKS CATALOG");
    System.out.println("====================================");
-   System.out.println("I. Show your library: ");
-   System.out.println("1. Show all books");
-   System.out.println("2. Show books by genre");
-   System.out.println("3. Show books by author");
-   System.out.println("4. Show all authors");
-   System.out.println("5. Show books by reading status");
-   System.out.println("6. Show books sorted by year");
-   System.out.println("7. Find books of given author");
-   System.out.println("8. Check author for given book title");
-   System.out.println("9. Show top genre");
-   System.out.println("====================================");
-   System.out.println("II. Update your Book Shelf: ");
-   System.out.println("10. Add a book");
-   System.out.println("11. Add an Author");
-   System.out.println("12. Set the reading status for your book");
-   System.out.println("13. Remove a book from the Book Shelf");
-   System.out.println("====================================");
-   System.out.println("0. Exit");
-   System.out.println("====================================");
+    Arrays.stream(MenuOption.values())
+        .forEach(menuOption ->
+            System.out.println(menuOption.getNumber() + ". " + menuOption.getDescription()));
   }
 
  private void showAllBooks(){
@@ -98,7 +81,6 @@ public class ConsoleUI {
  }
 
  private void showBooksByGenre() {
-
   Map<Genre, List<String>> books = libraryService.getBooksByGenre();
   if (books.isEmpty()) {
    System.out.println("No books found");
@@ -135,7 +117,6 @@ public class ConsoleUI {
     }
    System.out.println("========== Books by Reading status ==========");
    System.out.println(booksByReadingStatus);
-
   }
 
   private void showBooksByYear(){
@@ -201,7 +182,8 @@ public class ConsoleUI {
 
       System.out.println("Book: " + book + "Added to your Book Shelf.");
     } catch (Exception e) {
-      System.out.println("Book title and author must be set");
+      System.out.println
+          ("Book title and author must be set. \nYear cannot be greater than current year.\n Genre should be chosen from the list.");
     }
   }
 
