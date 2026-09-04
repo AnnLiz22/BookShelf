@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -63,6 +64,8 @@ public class LibraryServiceTest {
     assertEquals("The Shining", addedBook.getTitle());
     assertEquals(Genre.FICTION, addedBook.getGenre());
     assertEquals("Stephen King", addedBook.getAuthor().getName());
+    assertTrue(addedBook.getYear() < LocalDate.EPOCH.getYear());
+    assertTrue(addedBook.getAuthor().getName().length() >= 2);
   }
 
   @Test
