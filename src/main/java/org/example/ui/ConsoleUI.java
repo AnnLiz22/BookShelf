@@ -186,9 +186,9 @@ public class ConsoleUI {
       book.setGenre(readGenre());
     try {
       System.out.println("Book isbn: ");
-       String isbn = scanner.nextLine();
+       String isbn = scanner.nextLine().trim().replace("-", "");
        book.setIsbn(isbn);
-    } catch (Exception e) {
+    } catch (IllegalArgumentException e) {
       System.out.println(e.getMessage());
       return;
     }
