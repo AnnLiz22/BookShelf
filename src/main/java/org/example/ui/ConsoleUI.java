@@ -21,274 +21,305 @@ public class ConsoleUI {
   }
 
   public void start() {
-   boolean isRunning = true;
+    boolean isRunning = true;
 
-   while (isRunning) {
-    printMenu();
+    while (isRunning) {
+      printMenu();
 
-    int choice = readInt();
+      int choice = readInt();
 
-    switch (choice) {
-     case 1 -> showAllBooks();
-     case 2 -> showBooksByGenre();
-     case 3 -> showBooksByAuthor();
-     case 4 -> showAllAuthors();
-     case 5 -> showBooksByReadingStatus();
-     case 6 -> showBooksByYear();
-     case 7 -> findBooksOfAuthor();
-     case 8 -> showAuthorForGivenBookTitle();
-     case 9 -> showGenreWithBiggestNumberOfBooks();
-     case 10 -> addBook();
-     case 11 -> addAuthor();
-     case 12 -> setReadingStatusForBookFromLibrary();
-     case 13 -> removeBookFromYourBookShelf();
-     case 0 -> {
-      System.out.println("Goodbye! 👋");
-      isRunning = false;
-     }
-     default -> System.out.println("Invalid option.");
-   }
+      switch (choice) {
+        case 1 -> showAllBooks();
+        case 2 -> showBooksByGenre();
+        case 3 -> showBooksByAuthor();
+        case 4 -> showAllAuthors();
+        case 5 -> showBooksByReadingStatus();
+        case 6 -> showBooksByYear();
+        case 7 -> findBooksOfAuthor();
+        case 8 -> showAuthorForGivenBookTitle();
+        case 9 -> showGenreWithBiggestNumberOfBooks();
+        case 10 -> addBook();
+        case 11 -> addAuthor();
+        case 12 -> setReadingStatusForBookFromLibrary();
+        case 13 -> removeBookFromYourBookShelf();
+        case 0 -> {
+          System.out.println("Goodbye! 👋");
+          isRunning = false;
+        }
+        default -> System.out.println("Invalid option.");
+      }
+    }
   }
+
+  //helpers:
+  private int readInt() {
+
+    while (true) {
+      System.out.print("Choose an option: ");
+
+      try {
+        return Integer.parseInt(scanner.nextLine());
+      } catch (NumberFormatException e) {
+        System.out.println("Please enter a number.");
+      }
+    }
   }
- //helpers:
- private int readInt() {
 
-  while (true) {
-   System.out.print("Choose an option: ");
-
-   try {
-    return Integer.parseInt(scanner.nextLine());
-   } catch (NumberFormatException e) {
-    System.out.println("Please enter a number.");
-   }
-  }
- }
-
- private void printMenu() {
-   System.out.println();
-   System.out.println("====================================");
-   System.out.println("          📚 BOOKS CATALOG");
-   System.out.println("====================================");
+  private void printMenu() {
+    System.out.println();
+    System.out.println("====================================");
+    System.out.println("          📚 BOOKS CATALOG");
+    System.out.println("====================================");
     Arrays.stream(MenuOption.values())
         .forEach(menuOption ->
             System.out.println(menuOption.getNumber() + ". " + menuOption.getDescription()));
   }
 
- private void showAllBooks(){
-   List<Book> allBooks = libraryService.getAllBooks();
-  System.out.println("========== All books on your book shelf ==========");
-   System.out.println(allBooks);
- }
-
- private void showBooksByGenre() {
-  Map<Genre, List<String>> books = libraryService.getBooksByGenre();
-  if (books.isEmpty()) {
-   System.out.println("No books found");
-   return;
-  }
-  System.out.println("========== Books by genre ==========");
-  System.out.println(books);
+  private void showAllBooks() {
+    try {
+      List<Book> allBooks = libraryService.getAllBooks();
+      System.out.println("========== All books on your book shelf ==========");
+      System.out.println(allBooks);
+    } catch (NullPointerException e) {
+      System.out.println(e.getMessage());
+    }
   }
 
-  private void showAllAuthors(){
-    List<Author> authors = libraryService.getAllAuthors();
-    if (authors.isEmpty()) {
+  private void showBooksByGenre() {
+    try {
+      System.out.println("========== Books by genre ==========");
+
+      System.out.println(libraryService.getBooksByGenre());
+    } catch (NullPointerException e) {
+      System.out.println(e.getMessage());
+    }
+  }
+
+  private void showAllAuthors() {
+    if (libraryService.getAllAuthors().isEmpty()) {
       System.out.println("No authors found");
       return;
     }
-   System.out.println("========== Authors ==========");
-   System.out.println(authors);
+    System.out.println("========== Authors ==========");
+    System.out.println(libraryService.getAllAuthors());
   }
 
   private void showBooksByAuthor() {
     try {
-      Map<Author, List<String>> booksByAuthors = libraryService.getBooksByAuthor();
       System.out.println("========== Books by Authors ==========");
-      System.out.println(booksByAuthors);
+      System.out.println(libraryService.getBooksByAuthor());
+    } catch (NullPointerException e) {
+      System.out.println(e.getMessage());
+    }
+  }
+
+  private void showBooksByReadingStatus() {
+    if (libraryService.getBooksByReadingStatus().isEmpty()) {
+      System.out.println("No books found");
+      return;
+    }
+    System.out.println("========== Books by Reading status ==========");
+    System.out.println(libraryService.getBooksByReadingStatus());
+  }
+
+  private void showBooksByYear() {
+    if (libraryService.getBooksSortedByYear().isEmpty()) {
+      System.out.println("No books found");
+      return;
+    }
+    System.out.println("========== Books by Year of Publication ==========");
+    System.out.println(libraryService.getBooksSortedByYear());
+  }
+
+  private void showAuthorForGivenBookTitle() {
+    System.out.println("Choose title: ");
+    String title = scanner.nextLine();
+
+    try {
+      Author author = libraryService.findAuthorOfBookByTitle(title);
+      System.out.println("Author of " + title + ": " + author);
     } catch (Exception e) {
-      System.out.println("Author not found");
+      System.out.println("Title not found.");
+      ;
     }
   }
-  private void showBooksByReadingStatus(){
-   Map<ReadingStatus, List<String>> booksByReadingStatus = libraryService.getBooksByReadingStatus();
-    if (booksByReadingStatus.isEmpty()) {
-      System.out.println("No books found");
-      return;
+
+  private void findBooksOfAuthor() {
+    System.out.println("Choose author: ");
+    try {
+      String author = scanner.nextLine();
+      System.out.println("Books of " + author + " : "
+          + libraryService.getBooksForGivenAuthor(author));
+    } catch (NullPointerException e) {
+      System.out.println(e.getMessage());
     }
-   System.out.println("========== Books by Reading status ==========");
-   System.out.println(booksByReadingStatus);
   }
 
-  private void showBooksByYear(){
-   List<Book> booksByYear = libraryService.getBooksSortedByYear();
-    if (booksByYear.isEmpty()) {
-      System.out.println("No books found");
-      return;
+  private void showGenreWithBiggestNumberOfBooks() {
+    try {
+      System.out.println("Top genre on your book Shelf: " + libraryService.getGenreWithBiggestNumberOfBooks());
+    } catch (NullPointerException e) {
+      System.out.println("Nothing found.");
     }
-   System.out.println("========== Books by Year of Publication ==========");
-   System.out.println(booksByYear);
-  }
-
-  private void showAuthorForGivenBookTitle(){
-   System.out.println("Choose title: ");
-   String title = scanner.nextLine();
-
-   try {
-     Author author = libraryService.findAuthorOfBookByTitle(title);
-     System.out.println("Author of " + title + ": " + author);
-   } catch (Exception e) {
-     System.out.println("Title not found.");;
-   }
-  }
-
-  private void findBooksOfAuthor(){
-   System.out.println("Choose author: ");
-   try {
-     String author = scanner.nextLine();
-     System.out.println("Books of " + author + " : "
-         + libraryService.getBooksForGivenAuthor(author));
-   }catch (NullPointerException e){
-     System.out.println("Author not found.");
-   }
-  }
-
-  private void showGenreWithBiggestNumberOfBooks(){
-   Map<Genre, Long> genreWithBiggestNumOfBooks =
-       libraryService.getGenreWithBiggestNumberOfBooks();
-   System.out.println("Top genre on your book Shelf: " + genreWithBiggestNumOfBooks);
   }
 
   private void addBook() {
+
+    Book book = new Book();
     try {
       System.out.println("Book title: ");
       String title = scanner.nextLine();
+      book.setTitle(title);
+    } catch (IllegalArgumentException e) {
+      System.out.println(e.getMessage());
+      return;
+    }
 
+    try {
       System.out.println("Book author: ");
       String authorName = scanner.nextLine();
-
-      System.out.println("Choose book genre: ");
-      List.of(Genre.values()).forEach(System.out::println);
-      Genre genre = Genre.valueOf(scanner.nextLine().toUpperCase());
-
+      book.setAuthor(new Author(authorName));
+    } catch (NullPointerException e) {
+      System.out.println(e.getMessage());
+      return;
+    }
+      book.setGenre(readGenre());
+    try {
       System.out.println("Book isbn: ");
-      String isbn = scanner.nextLine();
-
+       String isbn = scanner.nextLine().trim().replace("-", "");
+       book.setIsbn(isbn);
+    } catch (IllegalArgumentException e) {
+      System.out.println(e.getMessage());
+      return;
+    }
+    try {
       System.out.println("Book year: ");
       int year = scanner.nextInt();
-
-      Author author = new Author(authorName);
-      Book book = new Book(title, author, genre, year, isbn);
-      libraryService.addBook(book);
-
-      System.out.println("Book: " + book + "Added to your Book Shelf.");
-    } catch (Exception e) {
-      System.out.println
-          ("Book title and author must be set. \nYear cannot be greater than current year.\n Genre should be chosen from the list.");
+      book.setYear(year);
+      scanner.nextLine();
+    } catch (IllegalArgumentException e) {
+      System.out.println(e.getMessage());
     }
+       libraryService.addBook(book);
+       System.out.println("Book: " + book + "Added to your Book Shelf.");
   }
 
-  private void addAuthor() {
-    System.out.println("Author name: ");
-    String authorName = scanner.nextLine();
-    Author author;
+private void addAuthor() {
+  System.out.println("Author name: ");
+  String authorName = scanner.nextLine();
+  Author author;
 
-    try {
-      author = new Author(authorName);
-      libraryService.addAuthor(author);
-    } catch (Exception e) {
-      System.out.println("Incorrect author name or author already exists.");
-      return;
-    }
-      System.out.println("Do you want to add book for this author? [YES/NO]");
-      String response = scanner.nextLine().trim().toUpperCase();
+  try {
+    author = new Author(authorName);
+    libraryService.addAuthor(author);
+  } catch (Exception e) {
+    System.out.println(e.getMessage());
+    return;
+  }
+  System.out.println("Do you want to add book for this author? [YES/NO]");
+  String response = scanner.nextLine().trim().toUpperCase();
 
-    if(response.equalsIgnoreCase("NO")) {
-      System.out.println("Author: " + author + " added.");
-      return;
-    }
-
-    while (response.equals("YES")) {
-        System.out.println("Book title: ");
-        String title = scanner.nextLine();
-      System.out.println("Choose book genre: ");
-      List.of(Genre.values()).forEach(System.out::println);
-      Genre genre = Genre.valueOf(scanner.nextLine().toUpperCase());
-
-        System.out.println("isbn:");
-        String isbn = scanner.nextLine();
-        System.out.println("year:");
-        int year = scanner.nextInt();
-        scanner.nextLine();
-
-        Book book = new Book(title, author, genre, year, isbn);
-        libraryService.addBook(book);
-        System.out.println("Author and book added. Do you want to add another book? [YES / NO]");
-        response = scanner.nextLine().toUpperCase();
-    }
+  if (response.equalsIgnoreCase("NO")) {
+    System.out.println("Author: " + author + " added.");
+    return;
   }
 
-  private void setReadingStatusForBookFromLibrary() {
-    System.out.println("Tape the book title: ");
-    Book book;
+  while (response.equals("YES")) {
+    System.out.println("Book title: ");
     String title = scanner.nextLine();
+    System.out.println("Choose book genre: ");
+    List.of(Genre.values()).forEach(System.out::println);
+    Genre genre = Genre.valueOf(scanner.nextLine().toUpperCase());
+
+    System.out.println("isbn:");
+    String isbn = scanner.nextLine();
+    System.out.println("year:");
+    int year = scanner.nextInt();
+    scanner.nextLine();
+
+    Book book = new Book(title, author, genre, year, isbn);
+    libraryService.addBook(book);
+    System.out.println("Author and book added. Do you want to add another book? [YES / NO]");
+    response = scanner.nextLine().toUpperCase();
+  }
+}
+
+private void setReadingStatusForBookFromLibrary() {
+  System.out.println("Tape the book title: ");
+  Book book;
+  String title = scanner.nextLine();
+  try {
+    book = libraryService.findBookByTitle(title);
+    System.out.println("Set the status to: \n [WANT_TO_READ, READING, FINISHED, ABANDONED]");
+    ReadingStatus status = ReadingStatus
+        .valueOf(scanner.nextLine().toUpperCase().replace(" ", "_"));
+    libraryService.setBookStatus(book.getTitle(), status);
+    System.out.println(book);
+
+  } catch (IllegalArgumentException e) {
+    System.out.println("The selected title appears more then once. Give the author name.");
     try {
-      book = libraryService.findBookByTitle(title);
+      String authorName = scanner.nextLine();
+      book = libraryService.findBookByTitleAndAuthorName(title, authorName);
       System.out.println("Set the status to: \n [WANT_TO_READ, READING, FINISHED, ABANDONED]");
       ReadingStatus status = ReadingStatus
           .valueOf(scanner.nextLine().toUpperCase().replace(" ", "_"));
-      libraryService.setBookStatus(book.getTitle(), status);
+      libraryService.setBookStatus(book.getTitle(), authorName, status);
       System.out.println(book);
-
-    } catch (IllegalArgumentException e) {
-      System.out.println("The selected title appears more then once. Give the author name.");
-      try {
-        String authorName = scanner.nextLine();
-        book = libraryService.findBookByTitleAndAuthorName(title, authorName);
-        System.out.println("Set the status to: \n [WANT_TO_READ, READING, FINISHED, ABANDONED]");
-        ReadingStatus status = ReadingStatus
-            .valueOf(scanner.nextLine().toUpperCase().replace(" ", "_"));
-        libraryService.setBookStatus(book.getTitle(), authorName, status);
-        System.out.println(book);
-      } catch (NullPointerException ex) {
-        System.out.println("Incorrect author");
-      }
+    } catch (NullPointerException ex) {
+      System.out.println("Incorrect author");
     }
   }
-  private void removeBookFromYourBookShelf() {
+}
 
-    System.out.println("Give the book title: ");
-    String title = scanner.nextLine();
-    Book book;
+private void removeBookFromYourBookShelf() {
+
+  System.out.println("Give the book title: ");
+  String title = scanner.nextLine();
+  Book book;
+
+  try {
+    book = libraryService.findBookByTitle(title);
+    System.out.println("Are you sure you want to remove " + book + "[YES/NO]");
+
+    String response = scanner.nextLine().toUpperCase();
+    if (response.equals("YES")) {
+
+      libraryService.removeBookByTitle(book.getTitle());
+      System.out.println("Book removed.");
+    }
+
+  } catch (IllegalArgumentException e) {
+    System.out.println(e.getMessage());
 
     try {
-      book = libraryService.findBookByTitle(title);
-      System.out.println("Are you sure you want to remove " + book + "[YES/NO]");
-
-      String response = scanner.nextLine().toUpperCase();
-      if (response.equals("YES")) {
-
-        libraryService.removeBookByTitle(book.getTitle());
-        System.out.println("Book removed.");
-      }
-
-    } catch (IllegalArgumentException e) {
-      System.out.println("Title duplicated. Give the author name.");
-
-      try{
       String authorName = scanner.nextLine();
       book = libraryService.findBookByTitleAndAuthorName(title, authorName);
-      System.out.println("Are you sure you want to remove " + book  + "[YES/NO]");
+      System.out.println("Are you sure you want to remove " + book + "[YES/NO]");
 
       String response = scanner.nextLine().toUpperCase();
       if (response.equals("YES")) {
         libraryService.removeBookByTitleAndAuthor(title, authorName);
         System.out.println("Book removed.");
-       }
-      }catch (NullPointerException ex){
-        System.out.println("Book with given title and author not found. Try again.");
       }
-    } catch (NullPointerException e) {
-      System.out.println("Title not found");
+    } catch (NullPointerException ex) {
+      System.out.println("Book with given title and author not found. Try again.");
+    }
+  } catch (NullPointerException e) {
+    System.out.println("Title not found");
+  }
+}
+
+  private Genre readGenre() {
+    while (true) {
+      System.out.println("Enter genre:");
+      String genre = scanner.nextLine().trim();
+
+      try {
+        return Genre.valueOf(genre.toUpperCase());
+      } catch (IllegalArgumentException e) {
+        System.out.println("Invalid genre. Choose from the list.");
+      }
     }
   }
- }
+}
