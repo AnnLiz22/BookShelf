@@ -99,6 +99,9 @@ public class Book {
   }
 
   public void setIsbn(String isbn) {
+    if(!(isbn.length() == 10 || isbn.length() == 13)){
+      throw new IllegalArgumentException("Incorrect isbn");
+    }
     this.isbn = isbn;
   }
 
