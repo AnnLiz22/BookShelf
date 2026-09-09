@@ -36,11 +36,9 @@ public class Book {
       throw new IllegalArgumentException("Title cannot be null or empty");
     }
     if(year > LocalDate.now().getYear()){
-      throw new IllegalArgumentException("Wrong year");
+      throw new IllegalArgumentException("Wrong year. Year cannot be greater than current year.");
     }
-    if(!List.of(Genre.values()).contains(genre)){
-      throw new IllegalArgumentException("Wrong genre");
-    }
+
     this.id = nextId++;
     this.title = title;
     this.author = author;
@@ -63,6 +61,9 @@ public class Book {
   }
 
   public void setTitle(String title) {
+    if (title == null || title.isBlank()) {
+      throw new IllegalArgumentException("Title cannot be null or empty");
+    }
     this.title = title;
   }
 
@@ -87,6 +88,9 @@ public class Book {
   }
 
   public void setYear(int year) {
+    if(year > LocalDate.now().getYear()){
+      throw new IllegalArgumentException("Wrong year. Year cannot be greater than current year.");
+    }
     this.year = year;
   }
 
