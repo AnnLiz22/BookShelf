@@ -11,7 +11,7 @@ public class Author {
 
   public Author(String name) {
     if(name == null || name.isBlank() || name.length() < 2){
-      throw new IllegalArgumentException();
+      throw new NullPointerException("Author name must be set.");
     }
     this.id = nextId;
     this.name = name;
