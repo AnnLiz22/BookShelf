@@ -2,7 +2,6 @@ package org.example.ui;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 import org.example.model.Author;
 import org.example.model.Book;
@@ -132,26 +131,32 @@ public class ConsoleUI {
   }
 
   private void showAuthorForGivenBookTitle() {
-    System.out.println("Choose title: ");
-    String title = scanner.nextLine();
-
-    try {
-      Author author = libraryService.findAuthorOfBookByTitle(title);
-      System.out.println("Author of " + title + ": " + author);
-    } catch (Exception e) {
-      System.out.println("Title not found.");
-      ;
+    while(true){
+      System.out.println("Give the book title: \n[OR Go back to Main Menu - 0]");
+      String title = scanner.nextLine();
+      if(title.equals("0")) return;
+      try {
+        Author author = libraryService.findAuthorOfBookByTitle(title);
+        System.out.println("Author of " + title + ": " + author);
+        return;
+      } catch (Exception e) {
+        System.out.println("Title not found.");
+      }
     }
   }
 
   private void findBooksOfAuthor() {
-    System.out.println("Choose author: ");
-    try {
-      String author = scanner.nextLine();
-      System.out.println("Books of " + author + " : "
+    while(true){
+      System.out.println("Give the author name: \n[OR Go back to the Main Menu - 0]");
+      String author = scanner.nextLine().trim();
+      if(author.equals("0")) return;
+      try {
+     System.out.println("Books of " + author + " : "
           + libraryService.getBooksForGivenAuthor(author));
-    } catch (NullPointerException e) {
-      System.out.println(e.getMessage());
+     return;
+      }catch (NullPointerException e){
+        System.out.println(e.getMessage());
+      }
     }
   }
 
@@ -168,7 +173,7 @@ public class ConsoleUI {
     Book book = new Book();
     try {
       System.out.println("Book title: ");
-      String title = scanner.nextLine();
+      String title = scanner.nextLine().trim();
       book.setTitle(title);
     } catch (IllegalArgumentException e) {
       System.out.println(e.getMessage());
