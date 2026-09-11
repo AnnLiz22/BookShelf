@@ -107,7 +107,7 @@ public class LibraryService {
   public List<Book> getAllBooks() {
 
     if(books.isEmpty()){
-      throw new NullPointerException();
+      throw new NullPointerException("No books added.");
     }
    return books.stream().sorted(Comparator.comparing(Book::getTitle)).toList();
   }
@@ -115,7 +115,7 @@ public class LibraryService {
   public Map<Author, List<String>> getBooksByAuthor() {
   List<Author> list =  books.stream().map(Book::getAuthor).toList();
   if(list.isEmpty()){
-    throw new NullPointerException();
+    throw new NullPointerException("Nothing found.");
   }
         return books.stream()
             .collect(Collectors.groupingBy(Book::getAuthor, mapping(Book::getTitle, toList())));
@@ -123,6 +123,10 @@ public class LibraryService {
   }
 
   public Map<Genre, List<String>> getBooksByGenre() {
+    List<Genre>list = books.stream().map(Book::getGenre).toList();
+    if(list.isEmpty()){
+      throw new NullPointerException("Nothing found.");
+    }
     return books
         .stream()
         .collect(Collectors.groupingBy(Book::getGenre, mapping(Book::getTitle, toList())));
@@ -145,9 +149,29 @@ public class LibraryService {
     return authors;
   }
 
+  public Author findAuthor(String authorName) {
+    return books.stream()
+        .filter(b -> b.getAuthor().getName().equalsIgnoreCase(authorName))
+        .map(Book::getAuthor)
+        .findFirst()
+        .orElseThrow(() ->
+            new IllegalArgumentException("Author not found."));
+  }
+
+  public Author findPossibleMatchForAuthor(String authorName) {
+    return books.stream()
+        .filter(b -> b.getAuthor().getName()
+            .toLowerCase()
+            .contains(authorName.toLowerCase()))
+        .map(Book::getAuthor)
+        .findFirst()
+        .orElseThrow(() ->
+            new IllegalArgumentException("Author not found."));
+  }
+
   public Author findAuthorOfBookByTitle(String title) {
    Optional <Author> author = books.stream()
-       .filter(b->b.getTitle().equals(title))
+       .filter(b->b.getTitle().equalsIgnoreCase(title))
        .map(Book::getAuthor).findFirst();
 
     return author.orElseThrow(NullPointerException::new);
@@ -170,18 +194,12 @@ public class LibraryService {
   }
 
   public Map<Author, List<Book>> getBooksForGivenAuthor(String authorName) {
-
-    Optional<Book> author = books.stream().filter(b->b.getAuthor()
-        .getName().equals(authorName)).findFirst();
-
-    if(author.isPresent()) {
-      return books
+    Author author = findAuthor(authorName);
+     return books
           .stream()
-          .filter(book -> book.getAuthor().getName().equals(authorName))
+          .filter(book -> book.getAuthor().equals(author))
           .collect(groupingBy(Book::getAuthor));
     }
-throw new NullPointerException();
-  }
 
   public void setBookStatus(String title, ReadingStatus readingStatus) {
 
