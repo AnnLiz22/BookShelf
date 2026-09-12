@@ -76,13 +76,13 @@ public class LibraryService {
 
   public Book findBookByTitle(String title) {
 
-    Long booksWithGivenTitle = books
+    long booksWithGivenTitle = books
         .stream()
         .filter(book1 -> book1.getTitle()
             .equalsIgnoreCase(title)).count();
 
     if (booksWithGivenTitle > 1) {
-      throw new IllegalArgumentException("Duplicated");
+      throw new IllegalArgumentException("The selected title appears more then once.");
     }
 
     Optional<Book> book = books.stream()
@@ -151,8 +151,8 @@ public class LibraryService {
 
   public Author findAuthor(String authorName) {
     return books.stream()
-        .filter(b -> b.getAuthor().getName().equalsIgnoreCase(authorName))
         .map(Book::getAuthor)
+        .filter(author -> author.getName().equalsIgnoreCase(authorName))
         .findFirst()
         .orElseThrow(() ->
             new IllegalArgumentException("Author not found."));
@@ -160,10 +160,10 @@ public class LibraryService {
 
   public Author findPossibleMatchForAuthor(String authorName) {
     return books.stream()
-        .filter(b -> b.getAuthor().getName()
+        .map(Book::getAuthor)
+        .filter(author -> author.getName()
             .toLowerCase()
             .contains(authorName.toLowerCase()))
-        .map(Book::getAuthor)
         .findFirst()
         .orElseThrow(() ->
             new IllegalArgumentException("Author not found."));
@@ -202,26 +202,12 @@ public class LibraryService {
     }
 
   public void setBookStatus(String title, ReadingStatus readingStatus) {
-
-    Long booksWithGivenTitle = books
-        .stream()
-        .filter(b -> b.getTitle()
-            .equalsIgnoreCase(title)).count();
-
-    if (booksWithGivenTitle > 1) {
-      throw new IllegalArgumentException("Duplicated");
-    }
-
-    Optional<Book>book = books.stream()
-        .filter(b -> b.getTitle().equalsIgnoreCase(title))
-        .findFirst();
-       book.ifPresent(value -> value.setReadingStatus(readingStatus));
+    Book book = findBookByTitle(title);
+    book.setReadingStatus(readingStatus);
   }
 
   public void setBookStatus(String title, String authorName, ReadingStatus readingStatus) {
-    Book book = books.stream().filter(book1 ->
-    book1.getTitle().equalsIgnoreCase(title) &&
-    book1.getAuthor().getName().equalsIgnoreCase(authorName)).findFirst().orElseThrow();
-    book.setReadingStatus(readingStatus);
+   Book book = findBookByTitleAndAuthorName(title, authorName);
+   book.setReadingStatus(readingStatus);
   }
 }
