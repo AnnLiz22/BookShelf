@@ -119,7 +119,7 @@ public class ConsoleUI {
   private void showAuthorForGivenBookTitle() {
     while (true) {
       System.out.println("Give the book title: \n[OR Go back to Main Menu - 0]");
-      String title = scanner.nextLine();
+      String title = scanner.nextLine().strip();
       if (title.equals("0")) {
         return;
       }
@@ -265,6 +265,7 @@ public class ConsoleUI {
     System.out.println("Tape the book title: ");
     Book book;
     String title = scanner.nextLine();
+
     try {
       book = libraryService.findBookByTitle(title);
       System.out.println("Set the status to: \n [WANT_TO_READ, READING, FINISHED, ABANDONED]");
@@ -273,10 +274,31 @@ public class ConsoleUI {
       libraryService.setBookStatus(book.getTitle(), status);
       System.out.println(book);
 
-    } catch (IllegalArgumentException e) {
-      System.out.println("The selected title appears more then once. Give the author name.");
+    }catch (NullPointerException e) {
+      System.out.println("Book title not found.");
+    }catch (IllegalArgumentException e) {
+      System.out.println(e.getMessage() + " Give the author name.");
       try {
         String authorName = scanner.nextLine();
+         try {
+           libraryService.findAuthor(authorName);
+         }catch (IllegalArgumentException ex){
+           try {
+             Author author = libraryService.findPossibleMatchForAuthor(authorName);
+             System.out.println("Did you mean " + author + "? [YES / NO]");
+             String response = scanner.nextLine().strip().toUpperCase();
+
+             if(response.equals("YES")){
+               authorName = author.getName();
+             }if(response.equals("NO")) {
+               System.out.println("No author found.");
+               return;
+             }
+           }catch(IllegalArgumentException exception){
+             System.out.println(exception.getMessage());
+             return;
+             }
+         }
         book = libraryService.findBookByTitleAndAuthorName(title, authorName);
         System.out.println("Set the status to: \n [WANT_TO_READ, READING, FINISHED, ABANDONED]");
         ReadingStatus status = ReadingStatus
@@ -284,7 +306,7 @@ public class ConsoleUI {
         libraryService.setBookStatus(book.getTitle(), authorName, status);
         System.out.println(book);
       } catch (NullPointerException ex) {
-        System.out.println("Incorrect author");
+       System.out.println("Incorrect author name for given book title.");
       }
     }
   }
