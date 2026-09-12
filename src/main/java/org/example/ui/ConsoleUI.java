@@ -196,7 +196,7 @@ public class ConsoleUI {
       System.out.println("Book author: ");
       String authorName = scanner.nextLine();
       book.setAuthor(new Author(authorName));
-    } catch (NullPointerException e) {
+    } catch (IllegalArgumentException e) {
       System.out.println(e.getMessage());
       return;
     }
@@ -223,41 +223,84 @@ public class ConsoleUI {
 
   private void addAuthor() {
     System.out.println("Author name: ");
-    String authorName = scanner.nextLine();
-    Author author;
+    String authorName = scanner.nextLine().strip();
+    Author author = new Author();
 
     try {
-      author = new Author(authorName);
+      author.setName(authorName);
       libraryService.addAuthor(author);
-    } catch (Exception e) {
-      System.out.println(e.getMessage());
+    } catch (IllegalArgumentException e) {
+      System.out.println(e.getMessage() + " Enter author name: ");
+      authorName = scanner.nextLine();
+      if (authorName == null || authorName.isBlank()) {
+        return;
+      }
+    }
+    try{
+      Author possibleAuthor = libraryService.findPossibleMatchForAuthor(authorName);
+      System.out.println("Did you mean " + possibleAuthor + "? [YES / NO]");
+      String response = scanner.nextLine().toUpperCase();
+      if (response.equals("YES")) {
+        System.out.println("Author "+ authorName + " already in the catalogue.");
+        return;
+      }}catch (IllegalArgumentException exception){
+      System.out.println(exception.getMessage());
       return;
     }
-    System.out.println("Do you want to add book for this author? [YES/NO]");
-    String response = scanner.nextLine().trim().toUpperCase();
 
-    if (response.equalsIgnoreCase("NO")) {
+    System.out.println("Do you want to add book for this author: "+ author +"? [YES/NO]");
+    String response1 = scanner.nextLine().trim().toUpperCase();
+
+    if (response1.equalsIgnoreCase("NO")) {
       System.out.println("Author: " + author + " added.");
       return;
     }
 
-    while (response.equals("YES")) {
-      System.out.println("Book title: ");
-      String title = scanner.nextLine();
-      System.out.println("Choose book genre: ");
-      List.of(Genre.values()).forEach(System.out::println);
-      Genre genre = Genre.valueOf(scanner.nextLine().toUpperCase());
-
-      System.out.println("isbn:");
-      String isbn = scanner.nextLine();
-      System.out.println("year:");
-      int year = scanner.nextInt();
-      scanner.nextLine();
-
-      Book book = new Book(title, author, genre, year, isbn);
+    while (response1.equals("YES")) {
+      Book book = new Book();
+      try {
+        book.setAuthor(author);
+        System.out.println("Book title: ");
+        String title = scanner.nextLine();
+        book.setTitle(title);
+      }catch (IllegalArgumentException ex){
+        System.out.println(ex.getMessage() + " Enter book title: ");
+        String title = scanner.nextLine();
+        if(title==null|| title.isBlank()){
+          return;
+        }
+        book.setTitle(title);
+      }
+      try {
+        System.out.println("Choose book genre: ");
+        List.of(Genre.values()).forEach(System.out::println);
+        String genre = scanner.nextLine().toUpperCase();
+        book.setGenre(Genre.valueOf(genre));
+      }catch (IllegalArgumentException exception) {
+        System.out.println("Choose genre from the list.");
+        String genre = scanner.nextLine().toUpperCase();
+        try{
+        book.setGenre(Genre.valueOf(genre));}
+        catch (IllegalArgumentException ex){
+          return;
+        }
+      } try {
+        System.out.println("Enter isbn number: ");
+        String isbn = scanner.nextLine();
+        book.setIsbn(isbn);
+      }catch(IllegalArgumentException isbnExc){
+        System.out.println(isbnExc.getMessage());}
+      try{
+        System.out.println("Enter book year: ");
+        int year = scanner.nextInt();
+        scanner.nextLine();
+        book.setYear(year);
+      }catch (IllegalArgumentException yearExc){
+        System.out.println(yearExc.getMessage());
+      }
       libraryService.addBook(book);
       System.out.println("Author and book added. Do you want to add another book? [YES / NO]");
-      response = scanner.nextLine().toUpperCase();
+      response1 = scanner.nextLine().toUpperCase();
     }
   }
 

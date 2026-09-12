@@ -62,7 +62,7 @@ public class Book {
 
   public void setTitle(String title) {
     if (title == null || title.isBlank()) {
-      throw new IllegalArgumentException("Title cannot be null or empty");
+      throw new IllegalArgumentException("Title cannot be null or empty.");
     }
     this.title = title;
   }
@@ -72,6 +72,10 @@ public class Book {
   }
 
   public void setAuthor(Author author) {
+
+      if(author.getName() == null || author.getName().isBlank() || author.getName().length() < 2){
+        throw new IllegalArgumentException("Author name must be set.");
+    }
     this.author = author;
   }
 
@@ -80,6 +84,7 @@ public class Book {
   }
 
   public void setGenre(Genre genre) {
+
     this.genre = genre;
   }
 
@@ -89,7 +94,7 @@ public class Book {
 
   public void setYear(int year) {
     if(year > LocalDate.now().getYear()){
-      throw new IllegalArgumentException("Wrong year. Year cannot be greater than current year.");
+      throw new IllegalArgumentException("Year cannot be greater than current year. You can add it later.");
     }
     this.year = year;
   }
@@ -100,7 +105,7 @@ public class Book {
 
   public void setIsbn(String isbn) {
     if(!(isbn.length() == 10 || isbn.length() == 13)){
-      throw new IllegalArgumentException("Incorrect isbn");
+      throw new IllegalArgumentException("Isbn is incorrect. You can add it later.");
     }
     this.isbn = isbn;
   }

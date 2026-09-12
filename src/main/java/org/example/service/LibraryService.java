@@ -38,9 +38,6 @@ public class LibraryService {
   }
 
   public void addAuthor(Author author) {
-    if(author == null || author.getName().isBlank() || author.getName()==null){
-      throw new NullPointerException("Author cannot be null");
-    }
     boolean exists = authors.stream()
         .anyMatch(a -> a.getName().equalsIgnoreCase(author.getName()));
 
