@@ -38,9 +38,6 @@ public class LibraryService {
   }
 
   public void addAuthor(Author author) {
-    if(author == null || author.getName().isBlank() || author.getName()==null){
-      throw new NullPointerException("Author cannot be null");
-    }
     boolean exists = authors.stream()
         .anyMatch(a -> a.getName().equalsIgnoreCase(author.getName()));
 
@@ -209,5 +206,12 @@ public class LibraryService {
   public void setBookStatus(String title, String authorName, ReadingStatus readingStatus) {
    Book book = findBookByTitleAndAuthorName(title, authorName);
    book.setReadingStatus(readingStatus);
+  }
+
+  public void updateBook(String title, String authorName, int year, String isbn){
+    Book book = findBookByTitleAndAuthorName(title, authorName);
+
+    book.setYear(year);
+    book.setIsbn(isbn);
   }
 }
