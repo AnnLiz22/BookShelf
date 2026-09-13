@@ -40,7 +40,8 @@ public class ConsoleUI {
         case 10 -> addBook();
         case 11 -> addAuthor();
         case 12 -> setReadingStatusForBookFromLibrary();
-        case 13 -> removeBookFromYourBookShelf();
+        case 13 -> editBook();
+        case 14 -> removeBookFromYourBookShelf();
         case 0 -> {
           System.out.println("Goodbye! 👋");
           isRunning = false;
@@ -49,6 +50,7 @@ public class ConsoleUI {
       }
     }
   }
+
 
   private void printMenu() {
     System.out.println();
@@ -353,7 +355,26 @@ public class ConsoleUI {
       }
     }
   }
+  private void editBook() {
+    try {
+      System.out.println("Enter the book title: ");
+      String title = scanner.nextLine();
+      System.out.println("Enter the author name: ");
+      String authorName = scanner.nextLine();
+      System.out.println("Update year of publication: ");
+      int year = scanner.nextInt();
+      scanner.nextLine();
+      System.out.println("Update isbn: ");
+      String isbn = scanner.nextLine();
+     libraryService.updateBook(title,authorName,year,isbn);
 
+   } catch (IllegalArgumentException e) {
+      System.out.println(e.getMessage());
+    }
+    System.out.println("Book updated.");
+
+
+  }
   private void removeBookFromYourBookShelf() {
 
     System.out.println("Give the book title: ");
