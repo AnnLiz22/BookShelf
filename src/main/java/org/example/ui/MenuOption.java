@@ -14,7 +14,8 @@ public enum MenuOption {
   ADD_BOOK(10, " Add a book"),
   ADD_AUTHOR(11, "Add an Author"),
   SET_READING_STATUS(12, "Set the reading status for your book"),
-  REMOVE_BOOK(13, "Remove a book from the Book Shelf"),
+  EDIT_BOOK(13, "Update detailed information about your book: year of publication and isbn."),
+  REMOVE_BOOK(14, "Remove book from Book Shelf."),
   EXIT(0, "Exit");
 
 
