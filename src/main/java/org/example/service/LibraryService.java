@@ -207,4 +207,11 @@ public class LibraryService {
    Book book = findBookByTitleAndAuthorName(title, authorName);
    book.setReadingStatus(readingStatus);
   }
+
+  public void updateBook(String title, String authorName, int year, String isbn){
+    Book book = findBookByTitleAndAuthorName(title, authorName);
+
+    book.setYear(year);
+    book.setIsbn(isbn);
+  }
 }
