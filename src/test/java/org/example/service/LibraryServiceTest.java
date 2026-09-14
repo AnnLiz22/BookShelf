@@ -64,7 +64,7 @@ public class LibraryServiceTest {
     assertEquals("The Shining", addedBook.getTitle());
     assertEquals(Genre.FICTION, addedBook.getGenre());
     assertEquals("Stephen King", addedBook.getAuthor().getName());
-    assertTrue(addedBook.getYear() < LocalDate.EPOCH.getYear());
+    assertTrue((addedBook.getYear() < (LocalDate.now().getYear())));
     assertTrue(addedBook.getAuthor().getName().length() >= 2);
   }
 
@@ -89,13 +89,11 @@ public class LibraryServiceTest {
   @Test
   void shouldThrowExceptionIfBookIsNullOrBookTitleIsEmptyOrNull(){
 
-    Book book1 = new Book();
-    book1.setTitle("");
-    Book book2 = new Book();
-    book2.setTitle(null);
-    book2.setAuthor(new Author("Jean Paul Sartre"));
-    assertThrows(NullPointerException.class, ()->libraryService.addBook(book1));
-    assertThrows(NullPointerException.class, ()->libraryService.addBook(book2));
+    assertThrows(IllegalArgumentException.class,
+        ()->libraryService.addBook(new Book("", new Author("author"), Genre.FICTION, 2000, "1233211234")
+));
+    assertThrows(IllegalArgumentException.class,
+        ()->libraryService.addBook(new Book(null, new Author("author"), Genre.FICTION, 2000, "1233211234")));
     assertThrows(NullPointerException.class, ()->libraryService.addBook(null));
   }
 
@@ -109,23 +107,26 @@ public class LibraryServiceTest {
   @Test
   void shouldThrowExceptionIfAuthorAlreadyExists(){
     Author author = new Author("Stephen King");
-    assertThrows(IllegalArgumentException.class, ()-> libraryService.addAuthor(author));
+    assertThrows(IllegalArgumentException.class,
+        ()-> libraryService.addAuthor(author));
   }
 
   @Test
   void shouldThrowExceptionIfAuthorIsNull(){
-    assertThrows(NullPointerException.class, ()->libraryService.addAuthor(null));
+    assertThrows(NullPointerException.class,
+        ()->libraryService.addAuthor(null));
   }
 @Test
 void shouldThrowExceptionIfAuthorNameIsEmpty() {
-    Author author = new Author();
-    author.setName("");
-  assertThrows(NullPointerException.class, ()->libraryService.addAuthor(author));
+
+  assertThrows(IllegalArgumentException.class,
+      ()->libraryService.addAuthor(new Author("")));
 }
 @Test
 void shouldThrowExceptionIfAuthorNameIsNull() {
     Author author = new Author();
-  assertThrows(NullPointerException.class, ()->libraryService.addAuthor(author));
+  assertThrows(IllegalArgumentException.class,
+      ()->libraryService.addAuthor(author));
 
 }
   @Test
@@ -266,6 +267,12 @@ void shouldThrowExceptionIfTitleIsNull() {
     Map<Genre, List<String>> result = libraryService.getBooksByGenre();
     assertEquals(List.of("Clean Code", "The Clean Coder", "Effective Java"),
         result.get(Genre.TECHNOLOGY));
+  }
+
+  @Test
+  void shouldThrowExceptionIfBooksByGenreIsEmpty(){
+    libraryService = new LibraryService();
+    assertThrows(NullPointerException.class, ()->libraryService.getBooksByGenre());
   }
 
   @Test
