@@ -38,6 +38,9 @@ public class LibraryService {
   }
 
   public void addAuthor(Author author) {
+    if(author==null || author.getName()==null){
+      throw new IllegalArgumentException();
+    }
     boolean exists = authors.stream()
         .anyMatch(a -> a.getName().equalsIgnoreCase(author.getName()));
 
