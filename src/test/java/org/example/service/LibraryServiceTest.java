@@ -32,7 +32,7 @@ public class LibraryServiceTest {
     libraryService = new LibraryService();
     books = createBooks();
     authors = createBooks().stream().map(Book::getAuthor).distinct().toList();
-    for(Book book : books){
+    for (Book book : books) {
       libraryService.addBook(book);
     }
   }
@@ -45,10 +45,10 @@ public class LibraryServiceTest {
   void shouldAddNewBookWithCorrectFieldsAndExistingAuthor() {
     Optional<Author> author = authors
         .stream()
-        .filter(b->b.getName()
+        .filter(b -> b.getName()
             .equalsIgnoreCase("Stephen King")).findFirst();
     Author author1 = null;
-    if(author.isPresent()){
+    if (author.isPresent()) {
       author1 = author.get();
     }
 
@@ -56,10 +56,10 @@ public class LibraryServiceTest {
     libraryService.addBook(book);
     assertTrue(libraryService.getAllBooks().contains(book));
     assertTrue(libraryService.getAllBooks().stream()
-        .anyMatch(b->b.getIsbn().equalsIgnoreCase("123454")));
+        .anyMatch(b -> b.getIsbn().equalsIgnoreCase("123454")));
 
     Book addedBook = libraryService.getAllBooks().stream()
-        .filter(b->b.getIsbn().equalsIgnoreCase("123454"))
+        .filter(b -> b.getIsbn().equalsIgnoreCase("123454"))
         .findFirst().orElseThrow();
     assertEquals("The Shining", addedBook.getTitle());
     assertEquals(Genre.FICTION, addedBook.getGenre());
@@ -69,15 +69,16 @@ public class LibraryServiceTest {
   }
 
   @Test
-  void shouldAddAuthorOfNewBookToAuthorsIfNotInCatalogue(){
+  void shouldAddAuthorOfNewBookToAuthorsIfNotInCatalogue() {
     Author author = new Author("Marcel Proust");
     Book book = new Book("W poszukiwaniu straconego czasu", author, Genre.FICTION, 1913, "123454");
     libraryService.addBook(book);
     assertTrue(libraryService.getAllAuthors().contains(author));
 
   }
+
   @Test
-  void shouldNotCreateNewAuthorIfAuthorExistsAndAddNewBook(){
+  void shouldNotCreateNewAuthorIfAuthorExistsAndAddNewBook() {
     Author author = new Author("Stephen King");
     Book book = new Book("The Shining", author, Genre.FICTION, 1977, "123454");
     libraryService.addBook(book);
@@ -87,14 +88,15 @@ public class LibraryServiceTest {
   }
 
   @Test
-  void shouldThrowExceptionIfBookIsNullOrBookTitleIsEmptyOrNull(){
+  void shouldThrowExceptionIfBookIsNullOrBookTitleIsEmptyOrNull() {
+    assertThrows(NullPointerException.class, ()->libraryService.addBook(null));
+    assertThrows(IllegalArgumentException.class,
+        () -> libraryService.addBook(new Book("", new Author("author"), Genre.FICTION, 2000, "1233211234")
+        ));
 
     assertThrows(IllegalArgumentException.class,
-        ()->libraryService.addBook(new Book("", new Author("author"), Genre.FICTION, 2000, "1233211234")
-));
-    assertThrows(IllegalArgumentException.class,
-        ()->libraryService.addBook(new Book(null, new Author("author"), Genre.FICTION, 2000, "1233211234")));
-    assertThrows(NullPointerException.class, ()->libraryService.addBook(null));
+        () -> libraryService.addBook(new Book(null, new Author("author"), Genre.FICTION, 2000, "1233211234")));
+    assertThrows(NullPointerException.class, () -> libraryService.addBook(null));
   }
 
   @Test
@@ -105,30 +107,32 @@ public class LibraryServiceTest {
   }
 
   @Test
-  void shouldThrowExceptionIfAuthorAlreadyExists(){
+  void shouldThrowExceptionIfAuthorAlreadyExists() {
     Author author = new Author("Stephen King");
     assertThrows(IllegalArgumentException.class,
-        ()-> libraryService.addAuthor(author));
+        () -> libraryService.addAuthor(author));
   }
 
   @Test
-  void shouldThrowExceptionIfAuthorIsNull(){
-    assertThrows(NullPointerException.class,
-        ()->libraryService.addAuthor(null));
+  void shouldThrowExceptionIfAuthorIsNull() {
+    assertThrows(IllegalArgumentException.class,
+        () -> libraryService.addAuthor(null));
   }
-@Test
-void shouldThrowExceptionIfAuthorNameIsEmpty() {
 
-  assertThrows(IllegalArgumentException.class,
-      ()->libraryService.addAuthor(new Author("")));
-}
-@Test
-void shouldThrowExceptionIfAuthorNameIsNull() {
+  @Test
+  void shouldThrowExceptionIfAuthorNameIsEmpty() {
+    assertThrows(IllegalArgumentException.class,
+        () -> libraryService.addAuthor(new Author("")));
+  }
+
+  @Test
+  void shouldThrowExceptionIfAuthorNameIsNull() {
     Author author = new Author();
-  assertThrows(IllegalArgumentException.class,
-      ()->libraryService.addAuthor(author));
+    assertThrows(IllegalArgumentException.class,
+        () -> libraryService.addAuthor(author));
 
-}
+  }
+
   @Test
   void shouldRemoveBookByTitle() {
     libraryService.removeBookByTitle("Clean Code");
@@ -139,68 +143,83 @@ void shouldThrowExceptionIfAuthorNameIsNull() {
 
   }
 
-@Test
-void shouldThrowExceptionIfTitleIsNull() {
-  assertThrows(NullPointerException.class, ()->libraryService.removeBookByTitle(null));
-  }
-
- @Test
- void shouldThrowExceptionIfTitleIsEmpty() {
-    assertThrows(NullPointerException.class, ()->libraryService.removeBookByTitle(""));
-   assertThrows(NullPointerException.class, ()->libraryService.removeBookByTitle(" "));
-
- }
-
-   @Test
-  void removeBookByTitleAndAuthor() {
-    assertTrue(libraryService.removeBookByTitleAndAuthor("Clean Code", "Robert C. Martin"));
+  @Test
+  void removeByTitle_shouldThrowExceptionIfTitleIsNull() {
+    assertThrows(NullPointerException.class,
+        () -> libraryService.removeBookByTitle(null));
   }
 
   @Test
-  void shouldThrowExceptionIfAuthorForTitleIsNull(){
-    assertThrows(NullPointerException.class,
-        ()->libraryService.removeBookByTitleAndAuthor("Misery", null));
+  void removeByTitle_shouldThrowExceptionIfTitleIsEmpty() {
+    assertThrows(NullPointerException.class, () -> libraryService.removeBookByTitle(""));
+    assertThrows(NullPointerException.class, () -> libraryService.removeBookByTitle(" "));
+
   }
 
   @Test
-  void shouldThrowExceptionIfAuthorForTitleIsEmpty(){
+  void shouldRemoveBookByTitleAndAuthor() {
+    assertTrue(libraryService.removeBookByTitleAndAuthor("Clean Code",
+        "Robert C. Martin"));
+  }
+
+  @Test
+  void removeByTitleAndAuthor_shouldThrowExceptionIfAuthorIsNull() {
     assertThrows(NullPointerException.class,
-        ()->libraryService.removeBookByTitleAndAuthor("Misery", ""));
+        () -> libraryService.removeBookByTitleAndAuthor("Misery", null));
+  }
+
+  @Test
+  void removeByTitleAndAuthor_shouldThrowExceptionIfAuthorIsEmpty() {
+    assertThrows(NullPointerException.class,
+        () -> libraryService.removeBookByTitleAndAuthor("Misery", ""));
   }
 
   @Test
   void findBookById() {
-    Book book = new Book();
-    book.setTitle("new book");
-    book.setAuthor(new Author("Stephen"));
-    libraryService.addBook(book);
-    Book addedBook = libraryService.getAllBooks().stream()
-        .filter(book1 -> book1
-            .getTitle().equalsIgnoreCase("new book")).findFirst().orElseThrow();
-    assertEquals(book.getTitle(), libraryService.findBookById(addedBook.getId()).getTitle());
+    assertEquals("Clean Code", libraryService.findBookById(1).getTitle());
   }
+
   @Test
-  void shouldThrowExceptionIfBookByIdNotFound(){
-    assertThrows(NullPointerException.class, ()->libraryService.findBookById(20));
+  void shouldThrowExceptionIfBookByIdNotFound() {
+    assertThrows(NullPointerException.class, () -> libraryService.findBookById(20));
   }
 
   @Test
   void shouldFindBookByTitle() {
-    Book book = new Book();
-    book.setTitle("new book");
-    book.setAuthor(new Author("Stephen"));
-    libraryService.addBook(book);
-    assertEquals(book.getTitle(), libraryService.findBookByTitle("new book").getTitle());
+    assertEquals("Clean Code",
+        libraryService.findBookByTitle("Clean Code").getTitle());
+    assertEquals("Robert C. Martin",
+        libraryService.findBookByTitle("Clean Code").getAuthor().getName());
   }
 
   @Test
-  void shouldThrowExceptionIfBookByTitleNotFound(){
-    assertThrows(NullPointerException.class, ()-> libraryService.findBookByTitle("not on bookshelf"));
+  void shouldFindBookByTitleAndIgnoreCase(){
+    assertEquals("Robert C. Martin",
+        libraryService.findBookByTitle("clean Code").getAuthor().getName());
+    assertEquals("Clean Code",
+        libraryService.findBookByTitle("Clean CODE").getTitle());
+  }
+  @Test
+  void shouldFindBookByTitleAndIgnoreEmptySpaces(){
+    assertEquals("Robert C. Martin",
+        libraryService.findBookByTitle(" Clean Code").getAuthor().getName());
+    assertEquals("Clean Code",
+        libraryService.findBookByTitle("Clean Code ").getTitle());
+    assertEquals("Clean Code",
+        libraryService.findBookByTitle("  Clean Code ").getTitle());
   }
 
   @Test
-  void shouldFindBookByTitleAndThrowExceptionIfTitleIsDuplicated(){
-    assertThrows(IllegalArgumentException.class, ()-> libraryService.findBookByTitle("Misery"));
+  void shouldThrowExceptionIfBookByTitleNotFound() {
+    assertThrows(NullPointerException.class,
+        () -> libraryService.findBookByTitle("Infinite Jest"));
+  }
+
+  @Test
+  void shouldFindBookByTitleAndThrowExceptionIfTitleIsDuplicated() {
+    IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        () -> libraryService.findBookByTitle("Misery"));
+    assertEquals("The selected title appears more then once.", exception.getMessage());
   }
 
   @Test
@@ -214,52 +233,79 @@ void shouldThrowExceptionIfTitleIsNull() {
   }
 
   @Test
-  void shouldFindBookByTitleAndAuthorNameOrThrowException(){
-    assertThrows(NullPointerException.class, ()->
+  void shouldFindBookByTitleAndAuthorNameAndIgnoreCase() {
+    assertEquals("Misery", libraryService
+        .findBookByTitleAndAuthorName("misery", "Stephen King").getTitle());
+    assertEquals("Stephen King", libraryService
+        .findBookByTitleAndAuthorName("Misery", "stephen KING").getAuthor().getName());
+  }
+
+  @Test
+  void shouldFindBookByTitleAndAuthorNameAndIgnoreEmptySpaces() {
+
+    assertEquals("Misery", libraryService
+        .findBookByTitleAndAuthorName("Misery  ", "Stephen King").getTitle());
+    assertEquals("Stephen King", libraryService
+        .findBookByTitleAndAuthorName("Misery", " Stephen King ").getAuthor().getName());
+  }
+
+  @Test
+  void findBookByTitleAndAuthorName_shouldThrowExceptionIfNotFoundOrNull() {
+    assertThrows(NullPointerException.class, () ->
         libraryService.findBookByTitleAndAuthorName("Misery", "No author"));
-    assertThrows(NullPointerException.class, ()->
+    assertThrows(NullPointerException.class, () ->
+        libraryService.findBookByTitleAndAuthorName("Ulisses", "Stephen King"));
+    assertThrows(NullPointerException.class, () ->
         libraryService.findBookByTitleAndAuthorName("", ""));
-    assertThrows(NullPointerException.class, ()->
+    assertThrows(NullPointerException.class, () ->
         libraryService.findBookByTitleAndAuthorName(null, null));
 
   }
 
   @Test
-  void shouldFindBookByIsbn() {
-    Author author = new Author("James Joyce");
-    Book book = new Book("Ulisses", author, Genre.FICTION, 1234, "123454095" );
-    libraryService.addBook(book);
-    assertEquals(book.getIsbn(), libraryService.findBookByIsbn("123454095").getIsbn());
+  void shouldFindBookByIsbn_ignoreCase_ignoreEmptySpaces_clean() {
+    assertEquals("Clean Code",
+        libraryService.findBookByIsbn("9780132350884").getTitle());
+    assertEquals("Clean Code",
+        libraryService.findBookByIsbn(" 9780132350884  ").getTitle());
+    assertEquals("Clean Code",
+        libraryService.findBookByIsbn("978-0132-350-884").getTitle());
+    assertEquals("Clean Code",
+        libraryService.findBookByIsbn("  978-0132-350-884").getTitle());
   }
 
   @Test
-  void shouldThrowExceptionIfIsbnNotFound(){
-    assertThrows(NullPointerException.class, ()->libraryService.findBookByIsbn("abcd"));
+  void shouldThrowExceptionIfIsbnNotFound() {
+    assertThrows(NullPointerException.class,
+        () -> libraryService.findBookByIsbn("abcd"));
   }
 
   @Test
   void shouldPrintAllBooksSorted() {
-    assertTrue(books.containsAll(libraryService.getAllBooks()));
+        assertTrue(books.containsAll(libraryService.getAllBooks()));
+        assertEquals("1984", libraryService.getAllBooks().get(0).getTitle());
+        assertEquals("Animal Farm", libraryService.getAllBooks().get(1).getTitle());
   }
 
   @Test
-  void shouldThrowExceptionIfBooksIsEmpty(){
+  void shouldThrowExceptionIfBooksIsEmpty() {
     libraryService = new LibraryService();
     assertThrows(NullPointerException.class, () -> libraryService.getAllBooks());
   }
 
   @Test
   void getBooksByAuthor() {
-  Map<Author, List<String>> booksByAuthor =  books.stream()
+    Map<Author, List<String>> expected = books.stream()
         .collect(Collectors.groupingBy(Book::getAuthor,
             Collectors.mapping(Book::getTitle, toList())));
-   assertEquals(booksByAuthor, libraryService.getBooksByAuthor());
+    assertEquals(expected, libraryService.getBooksByAuthor());
   }
 
   @Test
-  void shouldThrowExceptionIfAuthorsListIsEmpty(){
+  void shouldThrowExceptionIfAuthorsListIsEmpty() {
     libraryService = new LibraryService();
-    assertThrows(NullPointerException.class, ()->libraryService.getBooksByAuthor());
+    assertThrows(NullPointerException.class,
+        () -> libraryService.getBooksByAuthor());
   }
 
   @Test
@@ -270,25 +316,26 @@ void shouldThrowExceptionIfTitleIsNull() {
   }
 
   @Test
-  void shouldThrowExceptionIfBooksByGenreIsEmpty(){
+  void shouldThrowExceptionIfBooksByGenreIsEmpty() {
     libraryService = new LibraryService();
-    assertThrows(NullPointerException.class, ()->libraryService.getBooksByGenre());
+    assertThrows(NullPointerException.class, () -> libraryService.getBooksByGenre());
   }
 
   @Test
   void getBooksByReadingStatus() {
     Map<ReadingStatus, List<String>> result = libraryService.getBooksByReadingStatus();
     assertNull(result.get(ReadingStatus.FINISHED));
+
     assertEquals((books.stream().map(Book::getTitle).toList()),
         result.get(ReadingStatus.WANT_TO_READ));
   }
 
   @Test
   void getBooksSortedByYear() {
-   List<Book> result = libraryService.getBooksSortedByYear();
-   List <Book> expected = new ArrayList<>(books);
-   expected.sort(Comparator.comparingInt(Book::getYear));
-   assertEquals(expected, result);
+    List<Book> result = libraryService.getBooksSortedByYear();
+    List<Book> expected = new ArrayList<>(books);
+    expected.sort(Comparator.comparingInt(Book::getYear));
+    assertEquals(expected, result);
   }
 
   @Test
@@ -296,18 +343,33 @@ void shouldThrowExceptionIfTitleIsNull() {
     String result = libraryService.getAllAuthors().toString();
     String expected = authors.toString();
     assertEquals(expected, result);
+  }
 
+  @Test
+  void shouldFindAuthorWithIncompleteName_ignoreCase_ignoreEmptySpaces(){
+    assertEquals("Stephen King",
+        libraryService.findPossibleMatchForAuthor("King").getName());
+    assertEquals("Stephen King",
+        libraryService.findPossibleMatchForAuthor("Stephen").getName());
+    assertEquals("Stephen King",
+        libraryService.findPossibleMatchForAuthor("King  ").getName());
+    assertEquals("Stephen King",
+        libraryService.findPossibleMatchForAuthor("king").getName());
   }
 
   @Test
   void findAuthorOfBookByTitle() {
-    String title = "Clean Code";
     assertEquals("Robert C. Martin",
-        libraryService.findAuthorOfBookByTitle(title).getName());
+        libraryService.findAuthorOfBookByTitle("Clean Code").getName());
+    assertEquals("Robert C. Martin",
+        libraryService.findAuthorOfBookByTitle("Clean Code ").getName());
+    assertEquals("Robert C. Martin",
+        libraryService.findAuthorOfBookByTitle("clean coDE").getName());
   }
 
+
   @Test
-   void shouldCountBooksByGenre() {
+  void shouldCountBooksByGenre() {
     Map<Genre, Long> result = libraryService.getNumberOfBooksForEachGenre();
     Map<Genre, Long> expected = books.stream().collect(groupingBy(Book::getGenre, counting()));
     assertEquals(expected, result);
@@ -315,123 +377,58 @@ void shouldThrowExceptionIfTitleIsNull() {
 
   @Test
   void getGenreWithBiggestNumberOfBooks() {
-    assertTrue(libraryService.getGenreWithBiggestNumberOfBooks().containsKey(Genre.FICTION));
-    assertTrue(libraryService.getGenreWithBiggestNumberOfBooks().containsValue(6L));
+    assertTrue(libraryService
+        .getGenreWithBiggestNumberOfBooks().containsKey(Genre.FICTION));
+    assertTrue(libraryService
+        .getGenreWithBiggestNumberOfBooks().containsValue(6L));
   }
 
   @Test
   void getBooksForGivenAuthor() {
     Map<Author, List<String>> expected = new HashMap<>();
     Author author = new Author("Stephen King");
-    List <String> booksOfAuthor = List.of("Misery");
-    expected.put(author, booksOfAuthor );
-    assertEquals(expected.keySet().toString(), libraryService.getBooksForGivenAuthor("Stephen King").keySet().toString());
+    List<String> booksOfAuthor = List.of("Misery");
+    expected.put(author, booksOfAuthor);
+    assertEquals(expected.keySet().toString(),
+        libraryService.getBooksForGivenAuthor("Stephen King").keySet().toString());
     assertEquals(expected.size(), libraryService.getBooksForGivenAuthor("Stephen King").size());
+    assertEquals(expected.size(), libraryService.getBooksForGivenAuthor("  Stephen King").size());
+    assertEquals(expected.size(), libraryService.getBooksForGivenAuthor("Stephen KING").size());
   }
 
   @Test
   void setBookStatus() {
-    Book book =
-        libraryService.getAllBooks()
-            .stream()
-            .filter(b->b.getTitle().equalsIgnoreCase("Clean Code")).findFirst().orElseThrow();
-
-
+    assertEquals(ReadingStatus.WANT_TO_READ, books.get(0).getReadingStatus());
     libraryService.setBookStatus("Clean Code", ReadingStatus.READING);
-    assertEquals(ReadingStatus.READING, book.getReadingStatus());
+    assertEquals(ReadingStatus.READING, books.get(0).getReadingStatus());
   }
 
   @Test
-  void shouldThrowExceptionIfSetReadingStatusForDuplicatedTitle(){
-    assertThrows(IllegalArgumentException.class, ()->libraryService.setBookStatus("Misery", ReadingStatus.READING));
+  void shouldThrowExceptionIfSetReadingStatusForDuplicatedTitle() {
+    assertThrows(IllegalArgumentException.class,
+        () -> libraryService.setBookStatus("Misery", ReadingStatus.READING));
   }
 
 
-  private static List<Book> createBooks(){
+  private static List<Book> createBooks() {
+    List<String> authorNames = List.of("Robert C. Martin", "Joshua Bloch", "J.K. Rowling",
+        "J.R.R. Tolkien", "George Orwell", "Fyodor Dostoevsky", "Stephen King");
+    List<Author> authors = new ArrayList<>(authorNames.stream().map(Author::new).toList());
 
-    Author author1 = new Author("Robert C. Martin");
-    Author author2 = new Author("Joshua Bloch");
-    Author author3 = new Author("J.K. Rowling");
-    Author author4 = new Author("J.R.R. Tolkien");
-    Author author5 = new Author("George Orwell");
-    Author author6 = new Author("Fyodor Dostoevsky");
-    Author author7 = new Author("Stephen King");
+    List<Book> books = List.of(new Book("Clean Code", authors.get(0), Genre.TECHNOLOGY,
+        2008, "9780132350884"), new Book("The Clean Coder", authors.get(0),
+        Genre.TECHNOLOGY, 2011, "9780137081073"), new Book("Effective Java",
+        authors.get(1), Genre.TECHNOLOGY, 2018, "9780134685991"), new Book("Harry Potter and the Philosopher's Stone",
+        authors.get(2), Genre.FANTASY, 1997, "9780747532743"), new Book("Harry Potter and the Chamber of Secrets",
+        authors.get(2), Genre.FANTASY, 1998, "9780747538493"), new Book("The Hobbit",
+        authors.get(3), Genre.FANTASY, 1937, "9780261102217"), new Book("1984",
+        authors.get(4), Genre.FICTION, 1949, "9780451524935"), new Book("Animal Farm",
+        authors.get(4), Genre.FICTION, 1945, "9780451526342"), new Book("Crime and Punishment",
+        authors.get(5), Genre.FICTION, 1866, "9780143058144"), new Book("The Brothers Karamazov", authors.get(5),
+        Genre.FICTION, 1880, "9780374528379"), new Book("Misery", authors.get(6),
+        Genre.FICTION, 1880, "9780374528378"), new Book("Misery", authors.get(5), Genre.FICTION, 1880, "9780374528300"
+    ));
 
-    Book book1 = new Book("Clean Code", author1, Genre.TECHNOLOGY, 2008 ,"9780132350884");
-    Book book2 = new Book("The Clean Coder",
-        author1,
-        Genre.TECHNOLOGY,
-        2011,
-        "9780137081073");
-    Book book3 = new Book("Effective Java",
-        author2,
-        Genre.TECHNOLOGY,
-        2018,
-        "9780134685991");
-    Book book4 = new Book("Harry Potter and the Philosopher's Stone",
-        author3,
-        Genre.FANTASY,
-        1997,
-        "9780747532743"
-    );
-    Book book5 = new Book( "Harry Potter and the Chamber of Secrets",
-        author3,
-        Genre.FANTASY,
-        1998,
-        "9780747538493");
-
-    Book book6 = new Book( "The Hobbit",
-        author4,
-        Genre.FANTASY,
-        1937,
-        "9780261102217");
-
-    Book book7 = new Book(
-        "1984",
-        author5,
-        Genre.FICTION,
-        1949,
-        "9780451524935"
-    );
-
-    Book book8 = new Book(
-        "Animal Farm",
-        author5,
-        Genre.FICTION,
-        1945,
-        "9780451526342"
-    );
-    Book book9 = new Book(
-        "Crime and Punishment",
-        author6,
-        Genre.FICTION,
-        1866,
-        "9780143058144"
-    );
-
-    Book book10 = new Book(
-        "The Brothers Karamazov",
-        author6,
-        Genre.FICTION,
-        1880,
-        "9780374528379"
-    );
-    Book book11 = new Book(
-        "Misery",
-        author7,
-        Genre.FICTION,
-        1880,
-        "9780374528378"
-    );
-
-    Book book12 = new Book(
-        "Misery",
-        author6,
-        Genre.FICTION,
-        1880,
-        "9780374528300"
-    );
-
-    return new ArrayList<>(List.of(book1, book2, book3, book4, book5, book6, book7, book8, book9, book10, book11, book12));
+    return books;
   }
 }
