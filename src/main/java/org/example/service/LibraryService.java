@@ -79,28 +79,29 @@ public class LibraryService {
     long booksWithGivenTitle = books
         .stream()
         .filter(book1 -> book1.getTitle()
-            .equalsIgnoreCase(title)).count();
+            .equalsIgnoreCase(title.strip())).count();
 
     if (booksWithGivenTitle > 1) {
       throw new IllegalArgumentException("The selected title appears more then once.");
     }
 
     Optional<Book> book = books.stream()
-        .filter(b -> b.getTitle().equalsIgnoreCase(title)).findFirst();
+        .filter(b -> b.getTitle().equalsIgnoreCase(title.strip())).findFirst();
     return book.orElseThrow(NullPointerException::new);
   }
 
   public Book findBookByTitleAndAuthorName(String title, String authorName) {
     Optional<Book> book = books.stream()
-        .filter(b -> b.getTitle().equalsIgnoreCase(title)
-            && b.getAuthor().getName().equalsIgnoreCase(authorName))
+        .filter(b -> b.getTitle().equalsIgnoreCase(title.strip())
+            && b.getAuthor().getName().equalsIgnoreCase(authorName.strip()))
         .findFirst();
     return book.orElseThrow(NullPointerException::new);
   }
 
   public Book findBookByIsbn(String isbn) {
     Optional<Book> book = books.stream()
-        .filter(b -> b.getIsbn().equalsIgnoreCase(isbn)).findFirst();
+        .filter(b -> b.getIsbn()
+            .equalsIgnoreCase(isbn.strip().replace("-", ""))).findFirst();
     return book.orElseThrow(NullPointerException::new);
   }
 
@@ -152,7 +153,7 @@ public class LibraryService {
   public Author findAuthor(String authorName) {
     return books.stream()
         .map(Book::getAuthor)
-        .filter(author -> author.getName().equalsIgnoreCase(authorName))
+        .filter(author -> author.getName().equalsIgnoreCase(authorName.strip()))
         .findFirst()
         .orElseThrow(() ->
             new IllegalArgumentException("Author not found."));
@@ -163,7 +164,7 @@ public class LibraryService {
         .map(Book::getAuthor)
         .filter(author -> author.getName()
             .toLowerCase()
-            .contains(authorName.toLowerCase()))
+            .contains(authorName.toLowerCase().strip()))
         .findFirst()
         .orElseThrow(() ->
             new IllegalArgumentException("Author not found."));
@@ -171,7 +172,7 @@ public class LibraryService {
 
   public Author findAuthorOfBookByTitle(String title) {
    Optional <Author> author = books.stream()
-       .filter(b->b.getTitle().equalsIgnoreCase(title))
+       .filter(b->b.getTitle().equalsIgnoreCase(title.strip()))
        .map(Book::getAuthor).findFirst();
 
     return author.orElseThrow(NullPointerException::new);
