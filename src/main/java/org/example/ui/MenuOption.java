@@ -16,8 +16,8 @@ public enum MenuOption {
   SET_READING_STATUS(12, "Set the reading status for your book"),
   EDIT_BOOK(13, "Update detailed information about your book: year of publication and isbn."),
   REMOVE_BOOK(14, "Remove book from Book Shelf."),
+  COUNT_GENRES(15, "Count how many books for a given genre you have."),
   EXIT(0, "Exit");
-
 
   private final int number;
   private final String description;

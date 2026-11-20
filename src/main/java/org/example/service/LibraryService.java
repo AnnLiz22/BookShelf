@@ -120,11 +120,11 @@ public class LibraryService {
   }
         return books.stream()
             .collect(Collectors.groupingBy(Book::getAuthor, mapping(Book::getTitle, toList())));
-
   }
 
   public Map<Genre, List<String>> getBooksByGenre() {
-    List<Genre>list = books.stream().map(Book::getGenre).toList();
+    List<Genre>list = books.stream().map(Book::getGenre)
+        .toList();
     if(list.isEmpty()){
       throw new NullPointerException("Nothing found.");
     }
@@ -181,6 +181,17 @@ public class LibraryService {
   public Map<Genre, Long> getNumberOfBooksForEachGenre() {
     return books.stream()
         .collect(groupingBy(Book::getGenre, Collectors.counting()));
+  }
+
+  public String getGenresCountedByBooks(){
+
+  return  Genre.getGenres().stream()
+       .map(genre -> genre + ": " + books.stream()
+           .filter(book -> book
+               .getGenre().toString()
+               .equalsIgnoreCase(genre.substring(3)))
+             .count())
+       .collect(Collectors.joining("\n"));
   }
 
   public Map<Genre, Long> getGenreWithBiggestNumberOfBooks() {

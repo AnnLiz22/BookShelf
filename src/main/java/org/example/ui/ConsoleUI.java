@@ -42,6 +42,7 @@ public class ConsoleUI {
         case 12 -> setReadingStatusForBookFromLibrary();
         case 13 -> editBook();
         case 14 -> removeBookFromYourBookShelf();
+        case 15 -> countBooksForGivenGenre();
         case 0 -> {
           System.out.println("Goodbye! 👋");
           isRunning = false;
@@ -411,6 +412,10 @@ public class ConsoleUI {
     } catch (NullPointerException e) {
       System.out.println("Title not found");
     }
+  }
+
+  private void countBooksForGivenGenre(){
+    System.out.println(libraryService.getGenresCountedByBooks());
   }
 
   //helpers:
